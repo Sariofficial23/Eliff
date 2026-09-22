@@ -2,14 +2,16 @@ import { getUser } from '../telegram.js';
 import ProductCard from './ProductCard.jsx';
 import Icon from './Icon.jsx';
 
-const promos = [
-  { c: 'p1', t: 'Tez yetkazib berish', s: 'Issiqqina taomlar 30 daqiqada', icon: 'bike' },
-  { c: 'p2', t: 'Eng mazali burgerlar', s: 'Yangi pishirilgan', icon: 'burger' },
-  { c: 'p3', t: 'Shirin desertlar', s: 'Trayfl va chizkeyk', icon: 'cake' },
+// Bannerlar bo'sh bo'lsa (yoki hali yuklanmagan) — zaxira namunalar
+const FALLBACK_BANNERS = [
+  { id: 'f1', title: 'Быстрая доставка', subtitle: 'Горячие блюда за 30 минут', color: 'p1', emoji: '🛵' },
+  { id: 'f2', title: 'Пиццы Elif', subtitle: '14 видов, два размера', color: 'p2', emoji: '🍕', linkType: 'category', linkValue: 'Пицца' },
+  { id: 'f3', title: 'Сладкие десерты', subtitle: 'Трайфл и чизкейк', color: 'p3', emoji: '🍰', linkType: 'category', linkValue: 'Десерты' },
 ];
 
 export default function Home({
   products,
+  banners,
   loading,
   onOpen,
   onAdd,
@@ -22,6 +24,13 @@ export default function Home({
   const popular = products.slice(0, 8);
   const discounted = products.filter((p) => p.oldPrice);
   const qtyOf = (id) => cart.find((i) => i.id === id)?.qty || 0;
+
+  const bannerList = banners && banners.length ? banners : FALLBACK_BANNERS;
+  const onBanner = (b) => {
+    if (b.linkType === 'category' && b.linkValue) goCatalog(b.linkValue);
+    else if (b.linkType === 'url' && b.linkValue)
+      window.open(b.linkValue, '_blank');
+  };
 
   return (
     <div className="page">
@@ -48,15 +57,26 @@ export default function Home({
         </div>
       </div>
 
-      {/* Promo bannerlar */}
+      {/* Aksiya bannerlari (admin panelдан boshqariladi) */}
       <div className="rail">
-        {promos.map((p, i) => (
-          <div key={i} className={`promo ${p.c}`}>
-            <h3>{p.t}</h3>
-            <p>{p.s}</p>
-            <div className="emoji">
-              <Icon name={p.icon} size={94} strokeWidth={1.6} />
-            </div>
+        {bannerList.map((b) => (
+          <div
+            key={b.id}
+            className={`promo ${b.color || 'p1'}`}
+            style={
+              b.image
+                ? {
+                    backgroundImage: `linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,.05)), url(${b.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }
+                : undefined
+            }
+            onClick={() => onBanner(b)}
+          >
+            <h3>{b.title}</h3>
+            {b.subtitle && <p>{b.subtitle}</p>}
+            {!b.image && b.emoji && <div className="emoji">{b.emoji}</div>}
           </div>
         ))}
       </div>

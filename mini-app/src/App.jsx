@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { initTelegram, closeApp } from './telegram.js';
-import { getProducts, createOrder } from './api.js';
+import { getProducts, createOrder, getBanners } from './api.js';
 
 import Onboarding from './components/Onboarding.jsx';
 import Home from './components/Home.jsx';
@@ -16,6 +16,7 @@ export default function App() {
   );
   const [tab, setTab] = useState('home');
   const [products, setProducts] = useState([]);
+  const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState([]);
   const [activeProduct, setActiveProduct] = useState(null);
@@ -32,6 +33,9 @@ export default function App() {
       .then((data) => setProducts(Array.isArray(data) ? data : []))
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
+    getBanners()
+      .then((data) => setBanners(Array.isArray(data) ? data : []))
+      .catch(() => setBanners([]));
   }, []);
 
   const finishOnboarding = () => {
@@ -93,6 +97,7 @@ export default function App() {
       {tab === 'home' && (
         <Home
           products={products}
+          banners={banners}
           loading={loading}
           onOpen={setActiveProduct}
           onAdd={addToCart}

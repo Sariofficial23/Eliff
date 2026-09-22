@@ -9,6 +9,12 @@ import {
   changeOrderStatus,
   reseedMenu,
 } from '../controllers/adminController.js';
+import {
+  listBanners,
+  addBanner,
+  editBanner,
+  removeBanner,
+} from '../controllers/bannerController.js';
 
 const router = Router();
 
@@ -23,6 +29,12 @@ router.delete('/products/:id', removeProduct);
 
 // Menyuni koddan qayta yozish (posterdagi to'liq menyu)
 router.post('/seed', reseedMenu);
+
+// Aksiya bannerlari (CRUD)
+router.get('/banners', listBanners);
+router.post('/banners', addBanner);
+router.put('/banners/:id', editBanner);
+router.delete('/banners/:id', removeBanner);
 
 // Buyurtmalar
 router.get('/orders', listOrders);

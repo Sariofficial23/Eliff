@@ -12,6 +12,9 @@ const headers = () => ({
 export const getProducts = () =>
   fetch(`${API}/api/products`, { headers: headers() }).then((r) => r.json());
 
+export const getBanners = () =>
+  fetch(`${API}/api/banners`, { headers: headers() }).then((r) => r.json());
+
 export const createOrder = (data) =>
   fetch(`${API}/api/orders`, {
     method: 'POST',

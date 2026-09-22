@@ -57,3 +57,24 @@ export const deleteProduct = (id) =>
 // Menyuni koddan qayta yozish (posterdagi to'liq menyu)
 export const reseedMenu = () =>
   fetch(`${API}/api/admin/seed`, { method: 'POST', headers: H() }).then(json);
+
+// Aksiya bannerlari (CRUD)
+export const getBanners = () =>
+  fetch(`${API}/api/admin/banners`, { headers: H() }).then(json);
+export const addBanner = (data) =>
+  fetch(`${API}/api/admin/banners`, {
+    method: 'POST',
+    headers: H(),
+    body: JSON.stringify(data),
+  }).then(json);
+export const updateBanner = (id, data) =>
+  fetch(`${API}/api/admin/banners/${id}`, {
+    method: 'PUT',
+    headers: H(),
+    body: JSON.stringify(data),
+  }).then(json);
+export const deleteBanner = (id) =>
+  fetch(`${API}/api/admin/banners/${id}`, {
+    method: 'DELETE',
+    headers: H(),
+  }).then(json);

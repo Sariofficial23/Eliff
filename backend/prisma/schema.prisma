@@ -29,6 +29,21 @@ model Product {
   createdAt   DateTime @default(now())
 }
 
+// Aksiya banneri (bosh sahifada karusel)
+model Banner {
+  id        Int      @id @default(autoincrement())
+  title     String
+  subtitle  String?
+  image     String? // ixtiyoriy rasm URL (bo'lsa — fon rasmi)
+  emoji     String? // ixtiyoriy emoji (rasm bo'lmasa)
+  color     String? // gradient preset: p1 | p2 | p3
+  linkType  String? // 'category' | 'url' | null
+  linkValue String? // kategoriya nomi yoki URL
+  active    Boolean  @default(true)
+  sort      Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
 // Buyurtma
 model Order {
   id        Int      @id @default(autoincrement())

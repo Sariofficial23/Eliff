@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Orders from './pages/Orders.jsx';
 import Products from './pages/Products.jsx';
+import Banners from './pages/Banners.jsx';
 import { checkPassword } from './api.js';
 
 function Login({ onOk }) {
@@ -73,13 +74,21 @@ export default function App() {
         >
           🍔 Mahsulotlar
         </button>
+        <button
+          className={`nav-btn ${page === 'banners' ? 'active' : ''}`}
+          onClick={() => setPage('banners')}
+        >
+          🏷 Акции
+        </button>
         <button className="nav-btn logout-btn" onClick={logout}>
           🚪 Chiqish
         </button>
       </aside>
 
       <main className="main">
-        {page === 'orders' ? <Orders /> : <Products />}
+        {page === 'orders' && <Orders />}
+        {page === 'products' && <Products />}
+        {page === 'banners' && <Banners />}
       </main>
     </div>
   );
