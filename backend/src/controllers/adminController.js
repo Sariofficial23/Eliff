@@ -5,6 +5,8 @@ import {
   deleteProduct,
 } from '../models/Product.js';
 import { getAllOrders, updateOrderStatus } from '../models/Order.js';
+import prisma from '../database/connection.js';
+import { menuData } from '../data/menu.js';
 
 // ---------- Mahsulotlar (CRUD) ----------
 
@@ -75,5 +77,19 @@ export const changeOrderStatus = async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Holatni o\'zgartirishda xato' });
+  }
+};
+
+// ---------- Menyuni koddan qayta yozish (reseed) ----------
+// Eski mahsulotlarni o'chirib, src/data/menu.js dagi to'liq menyuni yozadi.
+// Buyurtmalar (items JSON) o'zgarmaydi. Admin parol bilan himoyalangan.
+export const reseedMenu = async (req, res) => {
+  try {
+    await prisma.product.deleteMany();
+    await prisma.product.createMany({ data: menuData });
+    res.json({ ok: true, count: menuData.length });
+  } catch (e) {
+    console.error('Reseed xatosi:', e);
+    res.status(500).json({ error: 'Menyuni yangilashda xato' });
   }
 };

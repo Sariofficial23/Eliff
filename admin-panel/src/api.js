@@ -53,3 +53,7 @@ export const deleteProduct = (id) =>
     method: 'DELETE',
     headers: H(),
   }).then(json);
+
+// Menyuni koddan qayta yozish (posterdagi to'liq menyu)
+export const reseedMenu = () =>
+  fetch(`${API}/api/admin/seed`, { method: 'POST', headers: H() }).then(json);

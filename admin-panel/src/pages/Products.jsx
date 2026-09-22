@@ -4,6 +4,7 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
+  reseedMenu,
 } from '../api.js';
 import { formatPrice } from '../utils.js';
 
@@ -22,6 +23,7 @@ export default function Products() {
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState(empty);
   const [editId, setEditId] = useState(null);
+  const [reseeding, setReseeding] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -75,6 +77,29 @@ export default function Products() {
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
+  const reseed = async () => {
+    if (
+      !window.confirm(
+        'Обновить меню из постеров?\n\nТекущий список товаров будет заменён на полное меню (пиццы, лаваши, напитки и т.д.) с фото. Заказы не тронутся.',
+      )
+    )
+      return;
+    setReseeding(true);
+    try {
+      const r = await reseedMenu();
+      if (r && r.ok) {
+        alert(`✅ Меню обновлено: ${r.count} позиций`);
+        load();
+      } else {
+        alert('Не удалось обновить меню');
+      }
+    } catch (e) {
+      alert('Ошибка при обновлении меню');
+    } finally {
+      setReseeding(false);
+    }
+  };
+
   return (
     <div>
       <div className="toolbar">
@@ -82,9 +107,18 @@ export default function Products() {
           <div className="page-title">Mahsulotlar</div>
           <div className="page-sub">Jami: {products.length} ta mahsulot</div>
         </div>
-        <button className="btn" onClick={openAdd}>
-          + Yangi pizza
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            className="btn btn-light"
+            onClick={reseed}
+            disabled={reseeding}
+          >
+            {reseeding ? '⏳ Обновление...' : '🔄 Обновить меню из постеров'}
+          </button>
+          <button className="btn" onClick={openAdd}>
+            + Yangi pizza
+          </button>
+        </div>
       </div>
 
       <div className="card">

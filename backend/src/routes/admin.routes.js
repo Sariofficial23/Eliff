@@ -7,6 +7,7 @@ import {
   removeProduct,
   listOrders,
   changeOrderStatus,
+  reseedMenu,
 } from '../controllers/adminController.js';
 
 const router = Router();
@@ -19,6 +20,9 @@ router.get('/products', listProducts);
 router.post('/products', addProduct);
 router.put('/products/:id', editProduct);
 router.delete('/products/:id', removeProduct);
+
+// Menyuni koddan qayta yozish (posterdagi to'liq menyu)
+router.post('/seed', reseedMenu);
 
 // Buyurtmalar
 router.get('/orders', listOrders);
