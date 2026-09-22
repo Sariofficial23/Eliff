@@ -2,145 +2,170 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Kategoriya bo'yicha rasm (placeholder). Admin Panelда har birini
-// haqiqiy (Instagram) rasm bilan almashtirish mumkin.
-const q = '?w=600&q=80';
-const IMG = {
-  Lavash: `https://images.unsplash.com/photo-1529006557810-274b9b2fc783${q}`,
-  Burger: `https://images.unsplash.com/photo-1568901346375-23c9450c58cd${q}`,
-  Shaurma: `https://images.unsplash.com/photo-1561651823-34feb02250e4${q}`,
-  'Xot-dog': `https://images.unsplash.com/photo-1619740455993-9d77a82c8559${q}`,
-  Pitsa: `https://images.unsplash.com/photo-1513104890138-7c749659a591${q}`,
-  KFC: `https://images.unsplash.com/photo-1562967914-608f82629710${q}`,
-  Fri: `https://images.unsplash.com/photo-1573080496219-bb080dd4f877${q}`,
-  Sendvich: `https://images.unsplash.com/photo-1528735602780-2552fd46c7af${q}`,
-  Salat: `https://images.unsplash.com/photo-1512621776951-a57141f2eefd${q}`,
-  Taomlar: `https://images.unsplash.com/photo-1544025162-d76694265947${q}`,
-  Souslar: `https://images.unsplash.com/photo-1504674900247-0877df9cc836${q}`,
-  Desert: `https://images.unsplash.com/photo-1551024506-0bccd828d307${q}`,
-  Kofe: `https://images.unsplash.com/photo-1509042239860-f550ce710b93${q}`,
-  Limonad: `https://images.unsplash.com/photo-1621263764928-df1444c5e859${q}`,
-  Ichimliklar: `https://images.unsplash.com/photo-1554866585-cd94860890b7${q}`,
+// Rasmlar mini-app/public/images/ ichida (posterlardan kesib olingan).
+// URL mini-app domenida ochiladi: /images/<fayl>.jpg
+const IMG = '/images';
+
+// Kategoriya rasmi (kategoriyadagi barcha mahsulotlar uchun umumiy)
+const CAT = {
+  'Лаваш': `${IMG}/lavash.jpg`,
+  'Гамбургер': `${IMG}/burger.jpg`,
+  'Шаурма': `${IMG}/shaurma.jpg`,
+  'Хот-дог': `${IMG}/hotdog.jpg`,
+  'Сендвич': `${IMG}/sendvich.jpg`,
+  'КФС': `${IMG}/kfc.jpg`,
+  'Блюда': `${IMG}/blyuda.jpg`,
+  'Салат': `${IMG}/salat.jpg`,
+  'Фри': `${IMG}/fri.jpg`,
+  'Соусы': `${IMG}/sous.jpg`,
+  'Десерты': `${IMG}/desert.jpg`,
+  'Кофе': `${IMG}/kofe.jpg`,
+  'Лимонад': `${IMG}/limonad.jpg`,
+  'Чай': `${IMG}/limonad.jpg`,
+  'Напитки': `${IMG}/napitki.jpg`,
+  'Пицца': `${IMG}/pizza-pepperoni.jpg`,
 };
 
-// Elif Fast Food — to'liq menyu
-const menu = [
-  // ---------- Lavash ----------
-  { category: 'Lavash', name: 'Lavash', newPrice: 38000, description: "Go'sht, kartoshka fri, sabzavot, maxsus sous" },
-  { category: 'Lavash', name: 'Lavash Big', newPrice: 42000, description: "Katta hajm, go'sht, fri, sabzavot, sous" },
-  { category: 'Lavash', name: 'Lavash Mini', newPrice: 34000, description: "Kichik hajm, go'sht, fri, sous" },
-  { category: 'Lavash', name: 'Lavash Tandir', newPrice: 48000, description: "Tandir lavash, go'sht, sabzavot, sous" },
-  { category: 'Lavash', name: 'Lavash Tandir Tovuqli', newPrice: 40000, description: "Tandir, tovuq go'shti, sabzavot, sous" },
-  { category: 'Lavash', name: 'Lavash Pishloqli', newPrice: 40000, description: "Go'sht, pishloq, fri, sabzavot, sous" },
-  { category: 'Lavash', name: 'Lavash Mini Pishloqli', newPrice: 36000, description: "Kichik, pishloq, go'sht, sous" },
-  { category: 'Lavash', name: 'Lavash Big Pishloqli', newPrice: 46000, description: "Katta, pishloq, go'sht, fri, sous" },
-  { category: 'Lavash', name: 'Lavash Tovuqli', newPrice: 32000, description: "Tovuq go'shti, fri, sabzavot, sous" },
-  { category: 'Lavash', name: 'Lavash Tovuqli Mini', newPrice: 30000, description: "Kichik, tovuq, fri, sous" },
-  { category: 'Lavash', name: 'Lavash Tovuqli Big', newPrice: 34000, description: "Katta, tovuq, fri, sabzavot, sous" },
-
-  // ---------- Burger ----------
-  { category: 'Burger', name: 'Gamburger', newPrice: 32000, description: "Mol go'shti kotleti, sabzavot, sous" },
-  { category: 'Burger', name: 'Chizburger', newPrice: 36000, description: "Kotlet, cheddar pishloq, sabzavot, sous" },
-  { category: 'Burger', name: 'Big Burger', newPrice: 42000, description: "Ikki kotlet, sabzavot, maxsus sous" },
-  { category: 'Burger', name: 'Big Chizburger', newPrice: 46000, description: "Ikki kotlet, pishloq, sabzavot, sous" },
-
-  // ---------- Shaurma / Donar ----------
-  { category: 'Shaurma', name: 'Donar Big', newPrice: 38000, description: "Katta donar, go'sht, sabzavot, sous" },
-  { category: 'Shaurma', name: 'Donar Mini', newPrice: 33000, description: "Kichik donar, go'sht, sabzavot, sous" },
-
-  // ---------- Xot-dog ----------
-  { category: 'Xot-dog', name: 'Xot-dog', newPrice: 20000, description: "Sosiska, non, ketchup, gorchitsa" },
-  { category: 'Xot-dog', name: 'Xot-dog Chiz', newPrice: 23000, description: "Sosiska, pishloq, sous" },
-  { category: 'Xot-dog', name: 'Haggi', newPrice: 37000, description: "Maxsus katta xot-dog, sous" },
-
-  // ---------- Pitsa (2 o'lcham: 25sm / 35sm) ----------
-  { category: 'Pitsa', name: 'Pitsa Pepperoni 25sm', newPrice: 55000, description: "Pepperoni, tomat sous, mozzarella pishloq" },
-  { category: 'Pitsa', name: 'Pitsa Pepperoni 35sm', newPrice: 75000, description: "Pepperoni, tomat sous, mozzarella pishloq" },
-  { category: 'Pitsa', name: 'Pitsa Elif 25sm', newPrice: 59000, description: "Maxsus sous, mozzarella, aralash go'sht" },
-  { category: 'Pitsa', name: 'Pitsa Elif 35sm', newPrice: 79000, description: "Maxsus sous, mozzarella, aralash go'sht" },
-  { category: 'Pitsa', name: 'Pitsa BBQ 25sm', newPrice: 69000, description: "BBQ sous, mozzarella, kotlet, pishloq" },
-  { category: 'Pitsa', name: 'Pitsa BBQ 35sm', newPrice: 89000, description: "BBQ sous, mozzarella, kotlet, pishloq" },
-  { category: 'Pitsa', name: "Pitsa Qo'ziqorinli 25sm", newPrice: 50000, description: "Sous, mozzarella, shampinyon qo'ziqorin" },
-  { category: 'Pitsa', name: "Pitsa Qo'ziqorinli 35sm", newPrice: 70000, description: "Sous, mozzarella, shampinyon qo'ziqorin" },
-  { category: 'Pitsa', name: 'Pitsa Sirli Max 25sm', newPrice: 44000, description: "Sous, mozzarella pishloq (4 xil pishloq)" },
-  { category: 'Pitsa', name: 'Pitsa Sirli Max 35sm', newPrice: 64000, description: "Sous, mozzarella pishloq (4 xil pishloq)" },
-  { category: 'Pitsa', name: 'Pitsa Donar 25sm', newPrice: 69000, description: "Sous, mozzarella, donar go'shti, piyoz, zaytun" },
-  { category: 'Pitsa', name: 'Pitsa Donar 35sm', newPrice: 89000, description: "Sous, mozzarella, donar go'shti, piyoz, zaytun" },
-  { category: 'Pitsa', name: "Pitsa Tovuq-Qo'ziqorin 25sm", newPrice: 64000, description: "Sous, mozzarella, tovuq filesi, qo'ziqorin" },
-  { category: 'Pitsa', name: "Pitsa Tovuq-Qo'ziqorin 35sm", newPrice: 74000, description: "Sous, mozzarella, tovuq filesi, qo'ziqorin" },
-  { category: 'Pitsa', name: 'Pitsa Margarita 25sm', newPrice: 44000, description: "Sous, mozzarella, pomidor, zaytun" },
-  { category: 'Pitsa', name: 'Pitsa Margarita 35sm', newPrice: 64000, description: "Sous, mozzarella, pomidor, zaytun" },
-
-  // ---------- KFC ----------
-  { category: 'KFC', name: 'Qanotchalar', newPrice: 38000, description: "Qarsildoq qovurilgan tovuq qanotchalari" },
-
-  // ---------- Fri ----------
-  { category: 'Fri', name: 'Fri kartoshka', newPrice: 16000, description: "Qarsildoq kartoshka fri" },
-  { category: 'Fri', name: 'Qishloqcha Fri', newPrice: 18000, description: "Po'sti bilan qovurilgan kartoshka" },
-
-  // ---------- Sendvich ----------
-  { category: 'Sendvich', name: 'Klab Sendvich', newPrice: 40000, description: "Uch qavatli klab sendvich, sabzavot" },
-  { category: 'Sendvich', name: "Klab Go'shtli", newPrice: 40000, description: "Go'shtli klab sendvich, pishloq, sabzavot" },
-
-  // ---------- Salat ----------
-  { category: 'Salat', name: 'Grek salati', newPrice: 22000, description: "Sabzavot, feta pishloq, zaytun, zaytun moyi" },
-  { category: 'Salat', name: 'Mujskoy Kapriz', newPrice: 28000, description: "Go'sht, sabzavot, maxsus sous" },
-
-  // ---------- Taomlar (Blyuda) ----------
-  { category: 'Taomlar', name: 'Donar Blyudo', newPrice: 54000, description: "Donar go'shti, garnir, sabzavot, sous" },
-  { category: 'Taomlar', name: 'Donar Blyudo Tovuqli', newPrice: 52000, description: "Tovuq donar, garnir, sabzavot, sous" },
-  { category: 'Taomlar', name: 'Iskender', newPrice: 58000, description: "Iskender kabob, non, sous, yogurt" },
-
-  // ---------- Souslar ----------
-  { category: 'Souslar', name: 'Sirli Sous', newPrice: 3000, description: "Pishloqli sous" },
-  { category: 'Souslar', name: 'Sarimsoqli Sous', newPrice: 3000, description: "Sarimsoqli oq sous" },
-  { category: 'Souslar', name: 'Xalapenyo', newPrice: 4000, description: "Achchiq xalapenyo sousi" },
-  { category: 'Souslar', name: 'Chili Sous', newPrice: 3000, description: "Achchiq chili sousi" },
-
-  // ---------- Desert ----------
-  { category: 'Desert', name: 'Trayfl Dubay', newPrice: 55000, description: "Dubay uslubidagi trayfl deserti" },
-  { category: 'Desert', name: 'Trayfl Snickers', newPrice: 50000, description: "Snickers ta'midagi trayfl" },
-  { category: 'Desert', name: 'Trayfl Qulupnay', newPrice: 50000, description: "Qulupnayli trayfl deserti" },
-  { category: 'Desert', name: 'Chizkeyk Elif', newPrice: 27000, description: "Maxsus Elif chizkeyki" },
-
-  // ---------- Kofe ----------
-  { category: 'Kofe', name: 'Kofe 3/1', newPrice: 10000, description: "Tez tayyor 3/1 kofe" },
-  { category: 'Kofe', name: 'Qora Kofe', newPrice: 8000, description: "Klassik qora kofe" },
-  { category: 'Kofe', name: 'Amerikano', newPrice: 16000, description: "Amerikano kofe" },
-  { category: 'Kofe', name: 'Kapuchino', newPrice: 18000, description: "Sutli kapuchino" },
-  { category: 'Kofe', name: 'Latte', newPrice: 17000, description: "Yumshoq sutli latte" },
-
-  // ---------- Limonad ----------
-  { category: 'Limonad', name: 'Limonad Qulupnay', newPrice: 19000, description: "Mohito, qulupnay ta'mi" },
-  { category: 'Limonad', name: 'Limonad Malina', newPrice: 19000, description: "Mohito, malina ta'mi" },
-  { category: 'Limonad', name: 'Limonad Kiwi', newPrice: 19000, description: "Mohito, kiwi ta'mi" },
-  { category: 'Limonad', name: 'Limonad Marakuya', newPrice: 19000, description: "Mohito, marakuya ta'mi" },
-  { category: 'Limonad', name: 'Limonad Tropik', newPrice: 19000, description: "Mohito, tropik ta'mi" },
-  { category: 'Limonad', name: "Limonad O'rmon rezavori", newPrice: 19000, description: "Mohito, o'rmon rezavorlari" },
-  { category: 'Limonad', name: 'Limonad Baba Gam', newPrice: 19000, description: "Mohito, baba gam ta'mi" },
-  { category: 'Limonad', name: "Limonad Ko'k Gavayi", newPrice: 19000, description: "Mohito, ko'k gavayi ta'mi" },
-  { category: 'Limonad', name: 'Limonad Smorodina', newPrice: 19000, description: "Mohito, qora smorodina" },
-  { category: 'Limonad', name: 'Limonad Apelsin', newPrice: 19000, description: "Mohito, apelsin ta'mi" },
-  { category: 'Limonad', name: 'Choy Limonli', newPrice: 12000, description: "Issiq limonli choy" },
-
-  // ---------- Ichimliklar ----------
-  { category: 'Ichimliklar', name: 'Pepsi 0.4L', newPrice: 9000, description: "Salqin Pepsi 400 ml" },
-  { category: 'Ichimliklar', name: 'Pepsi 1.5L', newPrice: 18000, description: "Pepsi 1.5 litr" },
-  { category: 'Ichimliklar', name: 'Pepsi 1L', newPrice: 12000, description: "Pepsi 1 litr" },
-  { category: 'Ichimliklar', name: 'Pepsi 0.5L', newPrice: 8000, description: "Pepsi 0.5 litr" },
-  { category: 'Ichimliklar', name: 'Cola 1.5L', newPrice: 18000, description: "Coca-Cola 1.5 litr" },
-  { category: 'Ichimliklar', name: 'Cola 1L', newPrice: 14000, description: "Coca-Cola 1 litr" },
-  { category: 'Ichimliklar', name: 'Cola 0.5L', newPrice: 8000, description: "Coca-Cola 0.5 litr" },
-  { category: 'Ichimliklar', name: 'Cola shishali', newPrice: 5000, description: "Shishadagi Coca-Cola" },
-  { category: 'Ichimliklar', name: 'Sok 1L', newPrice: 17000, description: "Tabiiy sharbat 1 litr" },
-  { category: 'Ichimliklar', name: 'Sok 200ml', newPrice: 6000, description: "Tabiiy sharbat 200 ml" },
+// Pitsa (har biriga o'z rasmi, 25 va 35 sm o'lchamlar)
+const pizzas = [
+  { name: 'Пепперони', img: 'pizza-pepperoni', p25: 55000, p35: 75000, d: 'Пепперони, итальянский соус, сыр моцарелла' },
+  { name: 'Элиф', img: 'pizza-elif', p25: 59000, p35: 79000, d: 'Соус, моцарелла, копчёная колбаса, сосиска, бондюэль, оливки, паприка' },
+  { name: 'BBQ', img: 'pizza-bbq', p25: 69000, p35: 89000, d: 'Соус, сыр моцарелла, 3 котлеты, сыр' },
+  { name: 'Курица с грибами', img: 'pizza-kuritsa-gribi', p25: 64000, p35: 74000, d: 'Соус, моцарелла, куриное филе, грибы' },
+  { name: 'Маргарита', img: 'pizza-margarita', p25: 44000, p35: 64000, d: 'Соус, моцарелла, помидор, оливки' },
+  { name: 'Грибная', img: 'pizza-gribnaya', p25: 50000, p35: 70000, d: 'Соус, моцарелла, шампиньоны' },
+  { name: 'Сырная MAX', img: 'pizza-syrnaya-max', p25: 44000, p35: 64000, d: 'Соус, сыр моцарелла' },
+  { name: 'Донар', img: 'pizza-donar', p25: 69000, p35: 89000, d: 'Соус, моцарелла, мясо, красный лук, оливки' },
+  { name: 'Супер комбо', img: 'pizza-super-kombo', p25: 69000, p35: 79000, d: 'Красный соус, моцарелла, кукуруза, пепперони, индейка, шампиньоны, маслины, болгарский перец, говядина барбекю' },
+  { name: 'Мясо с грибами', img: 'pizza-myaso-gribi', p25: 60000, p35: 79000, d: 'Фирменный соус, моцарелла, шампиньоны, говядина' },
+  { name: 'Мясное ассорти', img: 'pizza-myasnoe-assorti', p25: 79000, p35: 89000, d: 'Итальянский соус, цыплёнок барбекю, говядина барбекю, индейка, пепперони, моцарелла' },
+  { name: 'Острый Мексика', img: 'pizza-ostryi-meksika', p25: 58000, p35: 78000, d: 'Соус, моцарелла, колбаса, мясо, шампиньоны, паприка, оливки, халапеньо, чили соус, индейка' },
+  { name: 'Кази', img: 'pizza-kazi', p25: 69000, p35: 89000, d: 'Соус, моцарелла, кази, мясо, красный лук' },
+  { name: 'Четыре сезона', img: 'pizza-chetyre-sezona', p25: 58000, p35: 78000, d: 'Соус, моцарелла, пепперони, колбаса, мясо, шампиньоны, помидоры, бондюэль' },
 ];
 
-// Har bir mahsulotga kategoriya rasmini biriktiramiz
+const pizzaItems = pizzas.flatMap((z) => [
+  { category: 'Пицца', name: `Пицца ${z.name} 25 см`, newPrice: z.p25, description: z.d, image: `${IMG}/${z.img}.jpg` },
+  { category: 'Пицца', name: `Пицца ${z.name} 35 см`, newPrice: z.p35, description: z.d, image: `${IMG}/${z.img}.jpg` },
+]);
+
+// Elif fast food — to'liq menyu (posterlardan, ruscha)
+const menu = [
+  // ---------- Лаваш ----------
+  { category: 'Лаваш', name: 'Лаваш', newPrice: 38000, description: 'Мясо, картофель фри, овощи, соус' },
+  { category: 'Лаваш', name: 'Лаваш биг', newPrice: 42000, description: 'Большой, мясо, фри, овощи, соус' },
+  { category: 'Лаваш', name: 'Лаваш мини', newPrice: 34000, description: 'Маленький, мясо, фри, соус' },
+  { category: 'Лаваш', name: 'Лаваш тандир', newPrice: 48000, description: 'Тандыр, мясо, овощи, соус' },
+  { category: 'Лаваш', name: 'Лаваш тандир куриный', newPrice: 40000, description: 'Тандыр, курица, овощи, соус' },
+  { category: 'Лаваш', name: 'Лаваш с сыром', newPrice: 40000, description: 'Мясо, сыр, фри, овощи, соус' },
+  { category: 'Лаваш', name: 'Лаваш мини с сыром', newPrice: 36000, description: 'Маленький, сыр, мясо, соус' },
+  { category: 'Лаваш', name: 'Лаваш биг с сыром', newPrice: 46000, description: 'Большой, сыр, мясо, фри, соус' },
+  { category: 'Лаваш', name: 'Лаваш куриный', newPrice: 32000, description: 'Курица, фри, овощи, соус' },
+  { category: 'Лаваш', name: 'Лаваш куриный мини', newPrice: 30000, description: 'Маленький, курица, фри, соус' },
+  { category: 'Лаваш', name: 'Лаваш куриный биг', newPrice: 34000, description: 'Большой, курица, фри, овощи, соус' },
+
+  // ---------- Гамбургер ----------
+  { category: 'Гамбургер', name: 'Гамбургер', newPrice: 32000, description: 'Котлета из говядины, овощи, соус' },
+  { category: 'Гамбургер', name: 'Чизбургер', newPrice: 36000, description: 'Котлета, сыр чеддер, овощи, соус' },
+  { category: 'Гамбургер', name: 'Биг бургер', newPrice: 42000, description: 'Две котлеты, овощи, фирменный соус' },
+  { category: 'Гамбургер', name: 'Биг чизбургер', newPrice: 46000, description: 'Две котлеты, сыр, овощи, соус' },
+
+  // ---------- Шаурма ----------
+  { category: 'Шаурма', name: 'Донар биг', newPrice: 38000, description: 'Большой донар, мясо, овощи, соус' },
+  { category: 'Шаурма', name: 'Донар мини', newPrice: 33000, description: 'Маленький донар, мясо, овощи, соус' },
+
+  // ---------- Хот-дог ----------
+  { category: 'Хот-дог', name: 'Хот-дог', newPrice: 20000, description: 'Сосиска, булочка, кетчуп, горчица' },
+  { category: 'Хот-дог', name: 'Хот-дог чиз', newPrice: 23000, description: 'Сосиска, сыр, соус' },
+  { category: 'Хот-дог', name: 'Хагги', newPrice: 37000, description: 'Большой хот-дог, соус' },
+
+  // ---------- Сендвич ----------
+  { category: 'Сендвич', name: 'Клаб-сендвич', newPrice: 40000, description: 'Курица, овощи, соус' },
+  { category: 'Сендвич', name: 'Клаб мясной', newPrice: 40000, description: 'Мясо, овощи, соус' },
+
+  // ---------- КФС ----------
+  { category: 'КФС', name: 'Крылышки', newPrice: 38000, description: 'Куриные крылышки в панировке' },
+
+  // ---------- Блюда ----------
+  { category: 'Блюда', name: 'Донар блюдо', newPrice: 54000, description: 'Мясо донар, гарнир, соус' },
+  { category: 'Блюда', name: 'Донар блюдо куриный', newPrice: 52000, description: 'Курица донар, гарнир, соус' },
+  { category: 'Блюда', name: 'Искандер', newPrice: 58000, description: 'Искандер-кебаб, соус, гарнир' },
+
+  // ---------- Салат ----------
+  { category: 'Салат', name: 'Греческий салат', newPrice: 22000, description: 'Овощи, сыр, оливки, заправка' },
+  { category: 'Салат', name: 'Мужской каприз', newPrice: 28000, description: 'Мясо, овощи, фирменная заправка' },
+
+  // ---------- Фри ----------
+  { category: 'Фри', name: 'Фри', newPrice: 16000, description: 'Картофель фри' },
+  { category: 'Фри', name: 'Деревенское фри', newPrice: 18000, description: 'Картофель по-деревенски' },
+
+  // ---------- Соусы ----------
+  { category: 'Соусы', name: 'Сырный соус', newPrice: 3000, description: 'Сырный соус' },
+  { category: 'Соусы', name: 'Чесночный соус', newPrice: 3000, description: 'Чесночный соус' },
+  { category: 'Соусы', name: 'Халапеньо', newPrice: 4000, description: 'Острый соус халапеньо' },
+  { category: 'Соусы', name: 'Чили соус', newPrice: 3000, description: 'Соус чили' },
+
+  // ---------- Пицца ----------
+  ...pizzaItems,
+
+  // ---------- Десерты ----------
+  { category: 'Десерты', name: 'Трайфл дубайский', newPrice: 55000, description: 'Дубайский трайфл' },
+  { category: 'Десерты', name: 'Трайфл сникерс', newPrice: 50000, description: 'Трайфл со вкусом сникерса' },
+  { category: 'Десерты', name: 'Трайфл клубника', newPrice: 50000, description: 'Клубничный трайфл' },
+  { category: 'Десерты', name: 'Чизкейк Элиф', newPrice: 27000, description: 'Фирменный чизкейк' },
+
+  // ---------- Кофе ----------
+  { category: 'Кофе', name: 'Кофе 3/1', newPrice: 10000, description: 'Растворимый кофе 3 в 1' },
+  { category: 'Кофе', name: 'Кофе чёрный', newPrice: 8000, description: 'Чёрный кофе' },
+  { category: 'Кофе', name: 'Американо', newPrice: 16000, description: 'Американо' },
+  { category: 'Кофе', name: 'Капучино', newPrice: 18000, description: 'Капучино' },
+  { category: 'Кофе', name: 'Латте', newPrice: 17000, description: 'Латте' },
+
+  // ---------- Лимонад (мохито) ----------
+  { category: 'Лимонад', name: 'Мохито', newPrice: 19000, description: 'Классический мохито' },
+  { category: 'Лимонад', name: 'Мохито клубника', newPrice: 19000, description: 'Мохито со вкусом клубники' },
+  { category: 'Лимонад', name: 'Мохито малина', newPrice: 19000, description: 'Мохито со вкусом малины' },
+  { category: 'Лимонад', name: 'Мохито киви', newPrice: 19000, description: 'Мохито со вкусом киви' },
+  { category: 'Лимонад', name: 'Мохито маракуйя', newPrice: 19000, description: 'Мохито со вкусом маракуйи' },
+  { category: 'Лимонад', name: 'Мохито тропик', newPrice: 19000, description: 'Мохито тропик' },
+  { category: 'Лимонад', name: 'Мохито лесная ягода', newPrice: 19000, description: 'Мохито лесная ягода' },
+  { category: 'Лимонад', name: 'Мохито баба гам', newPrice: 19000, description: 'Мохито баба гам' },
+  { category: 'Лимонад', name: 'Мохито синее Гавайи', newPrice: 19000, description: 'Мохито синее Гавайи' },
+  { category: 'Лимонад', name: 'Мохито смородина', newPrice: 19000, description: 'Мохито чёрная смородина' },
+  { category: 'Лимонад', name: 'Мохито апельсин', newPrice: 19000, description: 'Мохито апельсин' },
+
+  // ---------- Чай ----------
+  { category: 'Чай', name: 'Чай клубника', newPrice: 15000, description: 'Фруктовый чай клубника' },
+  { category: 'Чай', name: 'Чай малина', newPrice: 15000, description: 'Фруктовый чай малина' },
+  { category: 'Чай', name: 'Чай киви', newPrice: 15000, description: 'Фруктовый чай киви' },
+  { category: 'Чай', name: 'Чай маракуйя', newPrice: 15000, description: 'Фруктовый чай маракуйя' },
+  { category: 'Чай', name: 'Чай тропик', newPrice: 15000, description: 'Фруктовый чай тропик' },
+  { category: 'Чай', name: 'Чай лесная ягода', newPrice: 15000, description: 'Фруктовый чай лесная ягода' },
+  { category: 'Чай', name: 'Чай смородина', newPrice: 15000, description: 'Фруктовый чай смородина' },
+  { category: 'Чай', name: 'Чай апельсин', newPrice: 15000, description: 'Фруктовый чай апельсин' },
+  { category: 'Чай', name: 'Чай с лимоном', newPrice: 12000, description: 'Горячий чай с лимоном' },
+
+  // ---------- Напитки ----------
+  { category: 'Напитки', name: 'Пепси 0.4 л', newPrice: 9000, description: 'Пепси розлив 400 мл' },
+  { category: 'Напитки', name: 'Пепси 1.5 л', newPrice: 18000, description: 'Пепси 1.5 литра' },
+  { category: 'Напитки', name: 'Пепси 1 л', newPrice: 12000, description: 'Пепси 1 литр' },
+  { category: 'Напитки', name: 'Пепси 0.5 л', newPrice: 8000, description: 'Пепси 0.5 литра' },
+  { category: 'Напитки', name: 'Кола 1.5 л', newPrice: 18000, description: 'Coca-Cola 1.5 литра' },
+  { category: 'Напитки', name: 'Кола 1 л', newPrice: 14000, description: 'Coca-Cola 1 литр' },
+  { category: 'Напитки', name: 'Кола 0.5 л', newPrice: 8000, description: 'Coca-Cola 0.5 литра' },
+  { category: 'Напитки', name: 'Кола бутылочная', newPrice: 5000, description: 'Coca-Cola в бутылке' },
+  { category: 'Напитки', name: 'Сок 1 л', newPrice: 17000, description: 'Натуральный сок 1 литр' },
+  { category: 'Напитки', name: 'Сок 200 мл', newPrice: 4000, description: 'Натуральный сок 200 мл' },
+];
+
+// Har bir mahsulotga rasm biriktiramiz (o'zining yoki kategoriya rasmi)
 const data = menu.map((p) => ({
-  ...p,
+  category: p.category,
+  name: p.name,
+  description: p.description,
+  newPrice: p.newPrice,
   oldPrice: null,
-  image: IMG[p.category] || IMG.Pitsa,
+  image: p.image || CAT[p.category] || CAT['Пицца'],
 }));
 
 async function main() {
@@ -148,7 +173,7 @@ async function main() {
   // (Buyurtmalar items'ni JSON sifatida saqlaydi — ular o'chmaydi.)
   await prisma.product.deleteMany();
   await prisma.product.createMany({ data });
-  console.log(`✅ Elif Fast Food menyusi yozildi: ${data.length} ta mahsulot.`);
+  console.log(`✅ Elif fast food menyusi yozildi: ${data.length} ta mahsulot.`);
 }
 
 main()
