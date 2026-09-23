@@ -3,6 +3,10 @@ import { formatPrice } from '../utils.js';
 import Icon from './Icon.jsx';
 
 const COLA = { id: 'cola', name: 'Coca-Cola 0.5L', price: 5000 };
+// 100 000 so'mdan yuqori buyurtmaga — bepul yetkazish va Cola taklifi;
+// pastroq bo'lsa — yetkazish pullik (avtomatik qo'shiladi)
+const FREE_FROM = 100000;
+const DELIVERY = { id: 'delivery', name: 'Yetkazib berish', price: 8000 };
 
 export default function Cart({ cart, changeQty, onConfirm, goCatalog }) {
   const [cola, setCola] = useState(false);
@@ -13,7 +17,13 @@ export default function Cart({ cart, changeQty, onConfirm, goCatalog }) {
   const [sending, setSending] = useState(false);
 
   const itemsTotal = cart.reduce((s, i) => s + i.newPrice * i.qty, 0);
-  const total = itemsTotal + (cola ? COLA.price : 0);
+  // Cola taklifi faqat 100 000+ buyurtmada ko'rinadi
+  const showUpsell = itemsTotal >= FREE_FROM;
+  const colaOn = showUpsell && cola;
+  const goodsTotal = itemsTotal + (colaOn ? COLA.price : 0);
+  const freeDelivery = goodsTotal >= FREE_FROM;
+  const deliveryFee = freeDelivery ? 0 : DELIVERY.price;
+  const total = goodsTotal + deliveryFee;
 
   const sendLocation = () => {
     if (!navigator.geolocation) {
@@ -73,8 +83,16 @@ export default function Cart({ cart, changeQty, onConfirm, goCatalog }) {
       price: i.newPrice,
       qty: i.qty,
     }));
-    if (cola)
+    if (colaOn)
       items.push({ id: COLA.id, name: COLA.name, price: COLA.price, qty: 1 });
+    // Yetkazish pullik bo'lsa — alohida pozitsiya sifatida qo'shamiz
+    if (deliveryFee > 0)
+      items.push({
+        id: DELIVERY.id,
+        name: DELIVERY.name,
+        price: DELIVERY.price,
+        qty: 1,
+      });
 
     const location = [address.trim(), geo ? geo.url : '']
       .filter(Boolean)
@@ -107,20 +125,22 @@ export default function Cart({ cart, changeQty, onConfirm, goCatalog }) {
           </div>
         ))}
 
-        {/* Upsell */}
-        <div className="upsell">
-          <div className="upsell-ico">
-            <Icon name="cup" size={24} />
+        {/* Upsell — faqat 100 000+ buyurtmada */}
+        {showUpsell && (
+          <div className="upsell">
+            <div className="upsell-ico">
+              <Icon name="cup" size={24} />
+            </div>
+            <div className="upsell-text">
+              Bunga qo'shimcha <b>Coca-Cola</b> ni atigi <b>5 000 so'm</b>ga
+              qo'shasizmi?
+            </div>
+            <div
+              className={`switch ${cola ? 'on' : ''}`}
+              onClick={() => setCola(!cola)}
+            />
           </div>
-          <div className="upsell-text">
-            Bunga qo'shimcha <b>Coca-Cola</b> ni atigi <b>5 000 so'm</b>ga
-            qo'shasizmi?
-          </div>
-          <div
-            className={`switch ${cola ? 'on' : ''}`}
-            onClick={() => setCola(!cola)}
-          />
-        </div>
+        )}
 
         {/* Joylashuv */}
         <div className="sec-label">
@@ -188,7 +208,28 @@ export default function Cart({ cart, changeQty, onConfirm, goCatalog }) {
           />
         </div>
 
-        <div className="total-row">
+        {/* Yetkazib berish */}
+        <div
+          className="total-row"
+          style={{ margin: '16px 0 0', fontSize: 14 }}
+        >
+          <span style={{ color: 'var(--text-2)' }}>Yetkazib berish:</span>
+          {freeDelivery ? (
+            <b style={{ color: 'var(--green)' }}>Bepul</b>
+          ) : (
+            <span style={{ fontWeight: 700 }}>
+              {formatPrice(DELIVERY.price)}
+            </span>
+          )}
+        </div>
+        {!freeDelivery && (
+          <div className="geo-hint" style={{ marginTop: 6 }}>
+            Bepul yetkazish uchun yana{' '}
+            <b>{formatPrice(FREE_FROM - goodsTotal)}</b>
+          </div>
+        )}
+
+        <div className="total-row" style={{ marginTop: 12 }}>
           <span>Jami to'lov:</span>
           <span className="big">{formatPrice(total)}</span>
         </div>
