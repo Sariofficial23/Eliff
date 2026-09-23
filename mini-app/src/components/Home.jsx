@@ -76,6 +76,7 @@ export default function Home({
           >
             <h3>{b.title}</h3>
             {b.subtitle && <p>{b.subtitle}</p>}
+            {b.price && <div className="promo-price">{b.price}</div>}
             {!b.image && b.emoji && <div className="emoji">{b.emoji}</div>}
           </div>
         ))}

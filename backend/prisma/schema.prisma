@@ -42,6 +42,7 @@ model Banner {
   subtitle  String?
   image     String? // ixtiyoriy rasm URL (bo'lsa — fon rasmi)
   emoji     String? // ixtiyoriy emoji (rasm bo'lmasa)
+  price     String? // ixtiyoriy narx matni (masalan "55 000 so'm")
   color     String? // gradient preset: p1 | p2 | p3
   linkType  String? // 'category' | 'url' | null
   linkValue String? // kategoriya nomi yoki URL

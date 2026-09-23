@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getBanners, addBanner, updateBanner, deleteBanner } from '../api.js';
+import { fileToCompressedDataUrl } from '../utils.js';
 import Icon from '../components/Icon.jsx';
 
 const empty = {
@@ -7,6 +8,7 @@ const empty = {
   subtitle: '',
   emoji: '',
   image: '',
+  price: '',
   color: 'p1',
   linkType: '',
   linkValue: '',
@@ -26,6 +28,7 @@ export default function Banners() {
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState(empty);
   const [editId, setEditId] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -47,6 +50,7 @@ export default function Banners() {
       subtitle: b.subtitle || '',
       emoji: b.emoji || '',
       image: b.image || '',
+      price: b.price || '',
       color: b.color || 'p1',
       linkType: b.linkType || '',
       linkValue: b.linkValue || '',
@@ -81,6 +85,21 @@ export default function Banners() {
   };
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const onPickImage = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    setUploading(true);
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file);
+      setForm((f) => ({ ...f, image: dataUrl }));
+    } catch (err) {
+      alert('Не удалось обработать фото');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div>
@@ -242,12 +261,81 @@ export default function Banners() {
             </div>
 
             <div className="field">
-              <label>Картинка (URL, необязательно)</label>
+              <label>Фото акции (необязательно)</label>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 12,
+                  alignItems: 'center',
+                  marginBottom: 8,
+                }}
+              >
+                <div
+                  style={{
+                    width: 96,
+                    height: 54,
+                    borderRadius: 10,
+                    background: '#f1f1f4',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#c4c4cc',
+                  }}
+                >
+                  {form.image ? (
+                    <img
+                      src={form.image}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <Icon name="image" size={22} />
+                  )}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="btn btn-light" style={{ cursor: 'pointer' }}>
+                    {uploading ? 'Обработка...' : (
+                      <>
+                        <Icon name="camera" size={16} /> Загрузить фото
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={onPickImage}
+                      disabled={uploading}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  {form.image && (
+                    <button
+                      type="button"
+                      className="btn-sm btn-danger"
+                      style={{ marginLeft: 8 }}
+                      onClick={() => setForm({ ...form, image: '' })}
+                    >
+                      Убрать
+                    </button>
+                  )}
+                </div>
+              </div>
               <input
                 className="input"
-                value={form.image}
+                value={form.image && form.image.startsWith('data:') ? '' : form.image}
                 onChange={set('image')}
-                placeholder="https://... (если есть — покажется вместо цвета)"
+                placeholder="…или ссылка на фото (URL)"
+              />
+            </div>
+
+            <div className="field">
+              <label>Цена (необязательно, показывается на баннере)</label>
+              <input
+                className="input"
+                value={form.price}
+                onChange={set('price')}
+                placeholder="Например: 55 000 so'm или от 45 000"
               />
             </div>
 

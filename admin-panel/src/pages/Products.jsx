@@ -26,6 +26,7 @@ export default function Products() {
   const [editId, setEditId] = useState(null);
   const [reseeding, setReseeding] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [cat, setCat] = useState('all');
 
   const load = () => {
     setLoading(true);
@@ -117,12 +118,21 @@ export default function Products() {
     }
   };
 
+  const categories = [
+    ...new Set(products.map((p) => p.category).filter(Boolean)),
+  ];
+  const shown = cat === 'all' ? products : products.filter((p) => p.category === cat);
+
   return (
     <div>
       <div className="toolbar">
         <div>
           <div className="page-title">Mahsulotlar</div>
-          <div className="page-sub">Jami: {products.length} ta mahsulot</div>
+          <div className="page-sub">
+            {cat === 'all'
+              ? `Jami: ${products.length} ta mahsulot`
+              : `${cat}: ${shown.length} ta`}
+          </div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button
@@ -144,10 +154,40 @@ export default function Products() {
         </div>
       </div>
 
+      {/* Kategoriya bo'yicha filtr */}
+      {categories.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+            marginBottom: 14,
+          }}
+        >
+          {['all', ...categories].map((c) => {
+            const active = cat === c;
+            return (
+              <button
+                key={c}
+                className="btn-sm"
+                onClick={() => setCat(c)}
+                style={{
+                  background: active ? '#e4002b' : '#f1f1f4',
+                  color: active ? '#fff' : '#333',
+                  fontWeight: 700,
+                }}
+              >
+                {c === 'all' ? 'Hammasi / Все' : c}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       <div className="card">
         {loading ? (
           <div className="loader">Yuklanmoqda...</div>
-        ) : products.length === 0 ? (
+        ) : shown.length === 0 ? (
           <div className="empty">
             <Icon name="inbox" size={44} strokeWidth={1.6} style={{ margin: '0 auto 10px' }} />
             Hozircha mahsulot yo'q
@@ -165,7 +205,7 @@ export default function Products() {
               </tr>
             </thead>
             <tbody>
-              {products.map((p) => (
+              {shown.map((p) => (
                 <tr key={p.id}>
                   <td>
                     <img className="thumb" src={p.image} alt={p.name} />

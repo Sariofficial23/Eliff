@@ -351,6 +351,19 @@ a {
   margin-top: 4px;
   max-width: 70%;
 }
+.promo-price {
+  display: inline-block;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #14141a;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  position: relative;
+  z-index: 1;
+}
 .promo .emoji {
   position: absolute;
   right: -6px;

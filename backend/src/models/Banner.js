@@ -26,6 +26,10 @@ export const ensureBannerTable = async () => {
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    // Narx ustunini qo'shamiz (eski jadvallar uchun ham) — additiv, xavfsiz
+    await prisma.$executeRawUnsafe(
+      `ALTER TABLE "Banner" ADD COLUMN IF NOT EXISTS "price" TEXT;`,
+    );
     const count = await prisma.banner.count();
     if (count === 0) {
       await prisma.banner.createMany({ data: DEFAULTS });
@@ -50,6 +54,7 @@ const clean = (d) => ({
   subtitle: d.subtitle || null,
   image: d.image || null,
   emoji: d.emoji || null,
+  price: d.price || null,
   color: d.color || 'p1',
   linkType: d.linkType || null,
   linkValue: d.linkValue || null,
