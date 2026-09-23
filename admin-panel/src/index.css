@@ -180,6 +180,38 @@ tr:hover td {
   color: var(--green);
 }
 
+/* Yangi (hali topshirilmagan) buyurtma — yengil sariq belgi */
+.row-new td {
+  background: #fffaf0;
+}
+.row-new td:first-child {
+  box-shadow: inset 3px 0 0 var(--amber);
+}
+
+/* 10 daqiqadan oshgan buyurtma — qizil ogohlantirish (yonib turadi) */
+.row-overdue td {
+  background: #ffe9e7 !important;
+  animation: pulseRed 1.3s ease-in-out infinite;
+}
+.row-overdue td:first-child {
+  box-shadow: inset 4px 0 0 var(--primary);
+}
+@keyframes pulseRed {
+  0%,
+  100% {
+    background: #ffece9;
+  }
+  50% {
+    background: #ffd4cf;
+  }
+}
+.warn-late {
+  margin-top: 5px;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .map-link {
   display: inline-block;
   margin-top: 4px;

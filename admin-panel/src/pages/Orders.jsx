@@ -24,6 +24,9 @@ export default function Orders() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [dateStr, setDateStr] = useState(''); // yyyy-mm-dd (aniq sana)
+  const [now, setNow] = useState(Date.now()); // kechikishni hisoblash uchun
+
+  const LATE_MIN = 10; // необработанный заказ старше 10 минут — предупреждение
 
   const load = () => {
     setLoading(true);
@@ -37,7 +40,12 @@ export default function Orders() {
     load();
     // Har 15 soniyada avtomatik yangilash
     const t = setInterval(load, 15000);
-    return () => clearInterval(t);
+    // Har 20 soniyada "hozir"ni yangilaymiz — kechikkan buyurtmalar yonishi uchun
+    const tick = setInterval(() => setNow(Date.now()), 20000);
+    return () => {
+      clearInterval(t);
+      clearInterval(tick);
+    };
   }, []);
 
   const filtered = useMemo(() => {
@@ -190,8 +198,16 @@ export default function Orders() {
             <tbody>
               {filtered.map((o) => {
                 const items = Array.isArray(o.items) ? o.items : [];
+                const pending = o.status !== 'yetkazildi';
+                const ageMin = (now - new Date(o.createdAt).getTime()) / 60000;
+                const overdue = pending && ageMin >= LATE_MIN;
+                const rowCls = overdue
+                  ? 'row-overdue'
+                  : pending
+                  ? 'row-new'
+                  : '';
                 return (
-                  <tr key={o.id}>
+                  <tr key={o.id} className={rowCls}>
                     <td>{o.id}</td>
                     <td>{o.user?.name || '—'}</td>
                     <td>{o.phone || o.user?.phone || '—'}</td>
@@ -212,6 +228,12 @@ export default function Orders() {
                       >
                         {o.status}
                       </span>
+                      {overdue && (
+                        <div className="warn-late icon-txt">
+                          <Icon name="alert" size={13} /> Kechikdi ·{' '}
+                          {Math.floor(ageMin)} daq
+                        </div>
+                      )}
                     </td>
                     <td>
                       <button
