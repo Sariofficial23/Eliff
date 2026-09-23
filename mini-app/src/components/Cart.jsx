@@ -75,9 +75,18 @@ export default function Cart({
     );
   }
 
+  // Telefon: faqat raqamlar, +998 dan keyin 9 ta raqam
+  const onPhone = (e) => {
+    let d = e.target.value.replace(/\D/g, '');
+    if (d.startsWith('998')) d = d.slice(3);
+    setPhone(d.slice(0, 9));
+  };
+  const phoneOk = phone.length === 9;
+  const fullPhone = '+998' + phone;
+
   const confirm = async () => {
-    if (!phone.trim()) {
-      alert('Iltimos, telefon raqamingizni kiriting');
+    if (!phoneOk) {
+      alert("Telefon raqamini to'liq kiriting: +998 dan keyin 9 ta raqam");
       return;
     }
     if (!geo && !address.trim()) {
@@ -107,7 +116,7 @@ export default function Cart({
       .filter(Boolean)
       .join(' | ');
 
-    await onConfirm({ items, total, phone, location });
+    await onConfirm({ items, total, phone: fullPhone, location });
   };
 
   return (
@@ -194,15 +203,17 @@ export default function Cart({
           </div>
         )}
 
-        <div className="field" style={{ marginTop: 14 }}>
-          <span className="field-ico">
-            <Icon name="phone" size={18} />
+        <div className="field phone-field" style={{ marginTop: 14 }}>
+          <span className="phone-prefix">
+            <Icon name="phone" size={17} /> +998
           </span>
           <input
             className="input"
-            placeholder="Telefon raqamingiz"
+            type="tel"
+            inputMode="numeric"
+            placeholder="90 123 45 67"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={onPhone}
           />
         </div>
         <div className="field">

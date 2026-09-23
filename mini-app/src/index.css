@@ -1098,3 +1098,24 @@ svg {
   margin-bottom: 0;
   padding-left: 44px;
 }
+
+/* Telefon: doimiy +998 prefiks */
+.phone-field .phone-prefix {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+  color: var(--text);
+  pointer-events: none;
+}
+.phone-field .phone-prefix svg {
+  color: var(--text-2);
+}
+.phone-field .input {
+  padding-left: 84px;
+  letter-spacing: 0.5px;
+}
