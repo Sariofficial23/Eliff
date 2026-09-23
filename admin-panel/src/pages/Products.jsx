@@ -132,7 +132,7 @@ export default function Products() {
             {reseeding ? '⏳ Обновление...' : '🔄 Обновить меню из постеров'}
           </button>
           <button className="btn" onClick={openAdd}>
-            + Yangi pizza
+            + Yangi
           </button>
         </div>
       </div>
@@ -199,7 +199,7 @@ export default function Products() {
       {modal && (
         <div className="overlay" onClick={() => setModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>{editId ? 'Pizzani tahrirlash' : 'Yangi pizza qo\'shish'}</h3>
+            <h3>{editId ? 'Mahsulotni tahrirlash' : 'Yangi mahsulot qo\'shish'}</h3>
 
             <div className="field">
               <label>Nomi *</label>
