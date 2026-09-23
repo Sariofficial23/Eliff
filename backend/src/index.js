@@ -8,6 +8,7 @@ import clientRoutes from './routes/client.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import { registerBot } from './routes/bot.routes.js';
 import { ensureBannerTable } from './models/Banner.js';
+import { ensureSettingsTable } from './models/Setting.js';
 
 // Xavfsizlik to'ri: kutilmagan xatolar jarayonni o'chirmasin (bot 24/7 ishlashi uchun)
 process.on('unhandledRejection', (e) =>
@@ -34,8 +35,9 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api', clientRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Aksiya bannerlari jadvalini tayyorlash (yo'q bo'lsa yaratadi)
+// Aksiya bannerlari va sozlamalar jadvallarini tayyorlash (yo'q bo'lsa yaratadi)
 ensureBannerTable();
+ensureSettingsTable();
 
 // Botni ishga tushirish
 registerBot();

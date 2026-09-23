@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { initTelegram, closeApp } from './telegram.js';
-import { getProducts, createOrder, getBanners } from './api.js';
+import { getProducts, createOrder, getBanners, getSettings } from './api.js';
 
 import Onboarding from './components/Onboarding.jsx';
 import Home from './components/Home.jsx';
@@ -17,6 +17,7 @@ export default function App() {
   const [tab, setTab] = useState('home');
   const [products, setProducts] = useState([]);
   const [banners, setBanners] = useState([]);
+  const [settings, setSettings] = useState({ freeFrom: 100000, deliveryFee: 8000 });
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState([]);
   const [activeProduct, setActiveProduct] = useState(null);
@@ -36,6 +37,14 @@ export default function App() {
     getBanners()
       .then((data) => setBanners(Array.isArray(data) ? data : []))
       .catch(() => setBanners([]));
+    getSettings()
+      .then((s) =>
+        setSettings({
+          freeFrom: Number(s?.freeFrom) || 100000,
+          deliveryFee: Number(s?.deliveryFee) >= 0 ? Number(s.deliveryFee) : 8000,
+        }),
+      )
+      .catch(() => {});
   }, []);
 
   const finishOnboarding = () => {
@@ -124,6 +133,7 @@ export default function App() {
           changeQty={changeQty}
           onConfirm={confirmOrder}
           goCatalog={() => setTab('catalog')}
+          settings={settings}
         />
       )}
       {tab === 'profile' && <Profile onReorder={handleReorder} />}

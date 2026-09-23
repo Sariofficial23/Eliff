@@ -29,6 +29,12 @@ model Product {
   createdAt   DateTime @default(now())
 }
 
+// Sozlamalar (key-value): bepul yetkazish chegarasi, yetkazish narxi
+model Setting {
+  key   String @id
+  value String
+}
+
 // Aksiya banneri (bosh sahifada karusel)
 model Banner {
   id        Int      @id @default(autoincrement())

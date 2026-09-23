@@ -3,6 +3,7 @@ import Orders from './pages/Orders.jsx';
 import Products from './pages/Products.jsx';
 import Banners from './pages/Banners.jsx';
 import Couriers from './pages/Couriers.jsx';
+import Settings from './pages/Settings.jsx';
 import Icon from './components/Icon.jsx';
 import { checkPassword } from './api.js';
 
@@ -80,6 +81,7 @@ export default function App() {
     { key: 'products', icon: 'burger', label: 'Mahsulotlar' },
     { key: 'banners', icon: 'tag', label: 'Акции' },
     { key: 'couriers', icon: 'bike', label: 'Kuryerlar' },
+    { key: 'settings', icon: 'settings', label: 'Настройки' },
   ];
 
   return (
@@ -127,6 +129,7 @@ export default function App() {
         {page === 'products' && <Products />}
         {page === 'banners' && <Banners />}
         {page === 'couriers' && <Couriers />}
+        {page === 'settings' && <Settings />}
       </main>
     </div>
   );

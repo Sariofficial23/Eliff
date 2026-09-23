@@ -58,6 +58,16 @@ export const deleteProduct = (id) =>
 export const reseedMenu = () =>
   fetch(`${API}/api/admin/seed`, { method: 'POST', headers: H() }).then(json);
 
+// Sozlamalar (yetkazish)
+export const getSettings = () =>
+  fetch(`${API}/api/admin/settings`, { headers: H() }).then(json);
+export const saveSettings = (data) =>
+  fetch(`${API}/api/admin/settings`, {
+    method: 'PUT',
+    headers: H(),
+    body: JSON.stringify(data),
+  }).then(json);
+
 // Aksiya bannerlari (CRUD)
 export const getBanners = () =>
   fetch(`${API}/api/admin/banners`, { headers: H() }).then(json);

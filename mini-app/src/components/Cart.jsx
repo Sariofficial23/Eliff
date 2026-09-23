@@ -3,12 +3,16 @@ import { formatPrice } from '../utils.js';
 import Icon from './Icon.jsx';
 
 const COLA = { id: 'cola', name: 'Coca-Cola 0.5L', price: 5000 };
-// 100 000 so'mdan yuqori buyurtmaga — bepul yetkazish va Cola taklifi;
-// pastroq bo'lsa — yetkazish pullik (avtomatik qo'shiladi)
-const FREE_FROM = 100000;
-const DELIVERY = { id: 'delivery', name: 'Yetkazib berish', price: 8000 };
+const DELIVERY_ID = 'delivery';
+const DELIVERY_NAME = 'Yetkazib berish';
 
-export default function Cart({ cart, changeQty, onConfirm, goCatalog }) {
+export default function Cart({
+  cart,
+  changeQty,
+  onConfirm,
+  goCatalog,
+  settings = {},
+}) {
   const [cola, setCola] = useState(false);
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -16,13 +20,18 @@ export default function Cart({ cart, changeQty, onConfirm, goCatalog }) {
   const [geoStatus, setGeoStatus] = useState('idle');
   const [sending, setSending] = useState(false);
 
+  // Sozlamalardan (admin panelдан) — chegara va yetkazish narxi
+  const FREE_FROM = Number(settings.freeFrom) > 0 ? Number(settings.freeFrom) : 100000;
+  const DELIVERY_PRICE =
+    Number(settings.deliveryFee) >= 0 ? Number(settings.deliveryFee) : 8000;
+
   const itemsTotal = cart.reduce((s, i) => s + i.newPrice * i.qty, 0);
-  // Cola taklifi faqat 100 000+ buyurtmada ko'rinadi
+  // Cola taklifi faqat chegaradan yuqori buyurtmada ko'rinadi
   const showUpsell = itemsTotal >= FREE_FROM;
   const colaOn = showUpsell && cola;
   const goodsTotal = itemsTotal + (colaOn ? COLA.price : 0);
   const freeDelivery = goodsTotal >= FREE_FROM;
-  const deliveryFee = freeDelivery ? 0 : DELIVERY.price;
+  const deliveryFee = freeDelivery ? 0 : DELIVERY_PRICE;
   const total = goodsTotal + deliveryFee;
 
   const sendLocation = () => {
@@ -88,9 +97,9 @@ export default function Cart({ cart, changeQty, onConfirm, goCatalog }) {
     // Yetkazish pullik bo'lsa — alohida pozitsiya sifatida qo'shamiz
     if (deliveryFee > 0)
       items.push({
-        id: DELIVERY.id,
-        name: DELIVERY.name,
-        price: DELIVERY.price,
+        id: DELIVERY_ID,
+        name: DELIVERY_NAME,
+        price: deliveryFee,
         qty: 1,
       });
 
@@ -218,7 +227,7 @@ export default function Cart({ cart, changeQty, onConfirm, goCatalog }) {
             <b style={{ color: 'var(--green)' }}>Bepul</b>
           ) : (
             <span style={{ fontWeight: 700 }}>
-              {formatPrice(DELIVERY.price)}
+              {formatPrice(DELIVERY_PRICE)}
             </span>
           )}
         </div>

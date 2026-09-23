@@ -6,12 +6,14 @@ import {
   myOrders,
 } from '../controllers/cartController.js';
 import { listActiveBanners } from '../controllers/bannerController.js';
+import { readSettings } from '../controllers/settingsController.js';
 
 const router = Router();
 
 // Mini App (mijoz) uchun API yo'llari
 router.get('/products', listProducts);
 router.get('/banners', listActiveBanners);
+router.get('/settings', readSettings);
 router.post('/orders', telegramAuth, placeOrder);
 router.get('/orders/my', telegramAuth, myOrders);
 

@@ -15,6 +15,10 @@ import {
   editBanner,
   removeBanner,
 } from '../controllers/bannerController.js';
+import {
+  readSettings,
+  saveSettings,
+} from '../controllers/settingsController.js';
 
 const router = Router();
 
@@ -35,6 +39,10 @@ router.get('/banners', listBanners);
 router.post('/banners', addBanner);
 router.put('/banners/:id', editBanner);
 router.delete('/banners/:id', removeBanner);
+
+// Sozlamalar (yetkazish)
+router.get('/settings', readSettings);
+router.put('/settings', saveSettings);
 
 // Buyurtmalar
 router.get('/orders', listOrders);

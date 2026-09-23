@@ -15,6 +15,9 @@ export const getProducts = () =>
 export const getBanners = () =>
   fetch(`${API}/api/banners`, { headers: headers() }).then((r) => r.json());
 
+export const getSettings = () =>
+  fetch(`${API}/api/settings`, { headers: headers() }).then((r) => r.json());
+
 export const createOrder = (data) =>
   fetch(`${API}/api/orders`, {
     method: 'POST',
