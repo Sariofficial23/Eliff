@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
+import https from 'https';
+import http from 'http';
 import { fileURLToPath } from 'url';
 import config from './config/default.js';
 import clientRoutes from './routes/client.routes.js';
@@ -63,3 +65,19 @@ if (fs.existsSync(miniDist)) {
 app.listen(config.port, () => {
   console.log(`✅ Server ishlayapti: http://localhost:${config.port}`);
 });
+
+// ---- Keep-alive ----
+// Render (free) 15 daqiqa trafik bo'lmasa serverni uxlatib qo'yadi.
+// Server o'zining /health manzilini har 10 daqiqada "ping" qilib turadi —
+// shunda uxlab qolmaydi va buyurtmalar darhol qabul qilinadi. Bepul.
+const KEEP_URL = process.env.RENDER_EXTERNAL_URL;
+if (KEEP_URL) {
+  const client = KEEP_URL.startsWith('https') ? https : http;
+  const ping = () => {
+    client
+      .get(`${KEEP_URL}/health`, (res) => res.resume())
+      .on('error', () => {});
+  };
+  setInterval(ping, 10 * 60 * 1000); // har 10 daqiqada
+  console.log('⏰ Keep-alive yoqildi:', KEEP_URL);
+}
