@@ -57,6 +57,9 @@ export default function App() {
     () => !!localStorage.getItem('adminPass'),
   );
   const [page, setPage] = useState('orders');
+  const [collapsed, setCollapsed] = useState(
+    () => localStorage.getItem('sbCollapsed') === '1',
+  );
 
   if (!authed) return <Login onOk={() => setAuthed(true)} />;
 
@@ -65,41 +68,57 @@ export default function App() {
     setAuthed(false);
   };
 
+  const toggleSidebar = () => {
+    setCollapsed((c) => {
+      localStorage.setItem('sbCollapsed', c ? '0' : '1');
+      return !c;
+    });
+  };
+
+  const nav = [
+    { key: 'orders', icon: 'box', label: 'Buyurtmalar' },
+    { key: 'products', icon: 'burger', label: 'Mahsulotlar' },
+    { key: 'banners', icon: 'tag', label: 'Акции' },
+    { key: 'couriers', icon: 'bike', label: 'Kuryerlar' },
+  ];
+
   return (
-    <div className="layout">
+    <div className={`layout ${collapsed ? 'collapsed' : ''}`}>
       <aside className="sidebar">
-        <div className="logo">
-          <span className="brand-mark">
-            <Icon name="burger" size={20} />
-          </span>
-          Elif Admin
+        <div className="sidebar-head">
+          <div className="logo">
+            <span className="brand-mark">
+              <Icon name="burger" size={20} />
+            </span>
+            <span className="nav-label">Elif Admin</span>
+          </div>
+          <button
+            className="sb-toggle"
+            onClick={toggleSidebar}
+            title={collapsed ? 'Развернуть меню' : 'Свернуть меню'}
+          >
+            <Icon name={collapsed ? 'menu' : 'chevronLeft'} size={18} />
+          </button>
         </div>
+
+        {nav.map((n) => (
+          <button
+            key={n.key}
+            className={`nav-btn ${page === n.key ? 'active' : ''}`}
+            onClick={() => setPage(n.key)}
+            title={n.label}
+          >
+            <Icon name={n.icon} size={19} />
+            <span className="nav-label">{n.label}</span>
+          </button>
+        ))}
         <button
-          className={`nav-btn ${page === 'orders' ? 'active' : ''}`}
-          onClick={() => setPage('orders')}
+          className="nav-btn logout-btn"
+          onClick={logout}
+          title="Chiqish"
         >
-          <Icon name="box" size={19} /> Buyurtmalar
-        </button>
-        <button
-          className={`nav-btn ${page === 'products' ? 'active' : ''}`}
-          onClick={() => setPage('products')}
-        >
-          <Icon name="burger" size={19} /> Mahsulotlar
-        </button>
-        <button
-          className={`nav-btn ${page === 'banners' ? 'active' : ''}`}
-          onClick={() => setPage('banners')}
-        >
-          <Icon name="tag" size={19} /> Акции
-        </button>
-        <button
-          className={`nav-btn ${page === 'couriers' ? 'active' : ''}`}
-          onClick={() => setPage('couriers')}
-        >
-          <Icon name="bike" size={19} /> Kuryerlar
-        </button>
-        <button className="nav-btn logout-btn" onClick={logout}>
-          <Icon name="logout" size={19} /> Chiqish
+          <Icon name="logout" size={19} />
+          <span className="nav-label">Chiqish</span>
         </button>
       </aside>
 

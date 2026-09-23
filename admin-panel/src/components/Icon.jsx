@@ -106,6 +106,14 @@ const P = {
       <path d="M5 12h14" />
     </>
   ),
+  menu: (
+    <>
+      <path d="M3 6h18" />
+      <path d="M3 12h18" />
+      <path d="M3 18h18" />
+    </>
+  ),
+  chevronLeft: <path d="m15 18-6-6 6-6" />,
   eye: (
     <>
       <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />

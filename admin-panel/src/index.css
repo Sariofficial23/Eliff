@@ -56,16 +56,60 @@ img {
   width: 240px;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  padding: 24px 16px;
+  padding: 20px 14px;
   flex-shrink: 0;
+  transition: width 0.18s ease;
+}
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px 20px;
 }
 .logo {
   font-size: 20px;
   font-weight: 800;
-  padding: 0 12px 24px;
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+}
+.sb-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sb-toggle:hover {
+  background: #ececf0;
+}
+
+/* Yig'ilgan (collapsed) holat: faqat ikonkalar */
+.layout.collapsed .sidebar {
+  width: 68px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.layout.collapsed .nav-label {
+  display: none;
+}
+.layout.collapsed .sidebar-head {
+  flex-direction: column-reverse;
+  gap: 14px;
+  padding-bottom: 16px;
+}
+.layout.collapsed .logo {
+  justify-content: center;
+}
+.layout.collapsed .nav-btn {
+  justify-content: center;
+  padding: 12px 0;
 }
 .brand-mark {
   width: 32px;
