@@ -6,7 +6,7 @@ import {
   deleteProduct,
   reseedMenu,
 } from '../api.js';
-import { formatPrice } from '../utils.js';
+import { formatPrice, fileToCompressedDataUrl } from '../utils.js';
 
 const empty = {
   name: '',
@@ -24,6 +24,7 @@ export default function Products() {
   const [form, setForm] = useState(empty);
   const [editId, setEditId] = useState(null);
   const [reseeding, setReseeding] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -76,6 +77,21 @@ export default function Products() {
   };
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const onPickImage = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = ''; // одну и ту же картинку можно выбрать снова
+    if (!file) return;
+    setUploading(true);
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file);
+      setForm((f) => ({ ...f, image: dataUrl }));
+    } catch (err) {
+      alert('Не удалось обработать фото. Попробуйте другое изображение.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const reseed = async () => {
     if (
@@ -190,12 +206,71 @@ export default function Products() {
               <input className="input" value={form.name} onChange={set('name')} />
             </div>
             <div className="field">
-              <label>Rasm URL</label>
+              <label>Фото блюда</label>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 12,
+                  alignItems: 'center',
+                  marginBottom: 8,
+                }}
+              >
+                <div
+                  style={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: 12,
+                    background: '#f1f1f4',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 26,
+                  }}
+                >
+                  {form.image ? (
+                    <img
+                      src={form.image}
+                      alt=""
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  ) : (
+                    '🍽'
+                  )}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="btn btn-light" style={{ cursor: 'pointer' }}>
+                    {uploading ? '⏳ Обработка...' : '📷 Загрузить фото'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={onPickImage}
+                      disabled={uploading}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  {form.image && (
+                    <button
+                      type="button"
+                      className="btn-sm btn-danger"
+                      style={{ marginLeft: 8 }}
+                      onClick={() => setForm({ ...form, image: '' })}
+                    >
+                      Убрать
+                    </button>
+                  )}
+                </div>
+              </div>
               <input
                 className="input"
-                value={form.image}
+                value={form.image && form.image.startsWith('data:') ? '' : form.image}
                 onChange={set('image')}
-                placeholder="https://..."
+                placeholder="…или вставьте ссылку на фото (URL)"
               />
             </div>
             <div className="field">

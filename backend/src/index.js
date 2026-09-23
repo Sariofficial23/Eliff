@@ -24,7 +24,8 @@ const adminDist = path.join(__dirname, '../../admin-panel/dist');
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+// Limit oshiriladi — admin panelдан rasm (base64) yuklash uchun
+app.use(express.json({ limit: '8mb' }));
 
 // Salomatlik tekshiruvi
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
