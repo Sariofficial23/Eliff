@@ -138,7 +138,7 @@ table {
 th,
 td {
   text-align: left;
-  padding: 14px 16px;
+  padding: 11px 13px;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
@@ -154,6 +154,35 @@ tr:last-child td {
 }
 tr:hover td {
   background: #fcfcfc;
+}
+
+/* Buyurtmalar jadvali: oxirgi ustun (holat + tugma) doim o'ngда ko'rinadi,
+   moноблок/tor ekranда ham "Yetkazildi" tugmasi yo'qolmaydi */
+.orders-table td:last-child,
+.orders-table th:last-child {
+  position: sticky;
+  right: 0;
+  background: var(--surface);
+  box-shadow: -8px 0 10px -8px rgba(0, 0, 0, 0.16);
+  white-space: nowrap;
+}
+.orders-table thead th:last-child {
+  background: #fafafa;
+}
+.orders-table tr:hover td:last-child {
+  background: #fcfcfc;
+}
+.orders-table .row-new td:last-child {
+  background: #fffaf0;
+}
+.orders-table .row-overdue td:last-child {
+  background: #ffece9;
+}
+.status-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 .thumb {

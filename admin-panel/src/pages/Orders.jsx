@@ -180,7 +180,7 @@ export default function Orders() {
             Bu davr uchun buyurtma yo'q
           </div>
         ) : (
-          <table>
+          <table className="orders-table">
             <thead>
               <tr>
                 <th>#</th>
@@ -192,7 +192,6 @@ export default function Orders() {
                 <th>Kuryer</th>
                 <th>Sana</th>
                 <th>Holati</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -221,37 +220,37 @@ export default function Orders() {
                       {formatDate(o.createdAt)}
                     </td>
                     <td>
-                      <span
-                        className={`badge ${
-                          o.status === 'yetkazildi' ? 'done' : 'pending'
-                        }`}
-                      >
-                        {o.status}
-                      </span>
-                      {overdue && (
-                        <div className="warn-late icon-txt">
-                          <Icon name="alert" size={13} /> Kechikdi ·{' '}
-                          {Math.floor(ageMin)} daq
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      <button
-                        className={`btn-sm ${
-                          o.status === 'yetkazildi' ? 'btn-light' : 'btn-green'
-                        }`}
-                        onClick={() => toggleStatus(o)}
-                      >
-                        {o.status === 'yetkazildi' ? (
-                          <>
-                            <Icon name="refresh" size={14} /> Qaytarish
-                          </>
-                        ) : (
-                          <>
-                            <Icon name="check" size={14} /> Yetkazildi
-                          </>
+                      <div className="status-cell">
+                        <span
+                          className={`badge ${
+                            o.status === 'yetkazildi' ? 'done' : 'pending'
+                          }`}
+                        >
+                          {o.status}
+                        </span>
+                        {overdue && (
+                          <div className="warn-late icon-txt">
+                            <Icon name="alert" size={13} /> Kechikdi ·{' '}
+                            {Math.floor(ageMin)} daq
+                          </div>
                         )}
-                      </button>
+                        <button
+                          className={`btn-sm ${
+                            o.status === 'yetkazildi' ? 'btn-light' : 'btn-green'
+                          }`}
+                          onClick={() => toggleStatus(o)}
+                        >
+                          {o.status === 'yetkazildi' ? (
+                            <>
+                              <Icon name="refresh" size={14} /> Qaytarish
+                            </>
+                          ) : (
+                            <>
+                              <Icon name="check" size={14} /> Yetkazildi
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
