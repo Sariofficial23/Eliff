@@ -3,6 +3,7 @@ import Orders from './pages/Orders.jsx';
 import Products from './pages/Products.jsx';
 import Banners from './pages/Banners.jsx';
 import Couriers from './pages/Couriers.jsx';
+import Icon from './components/Icon.jsx';
 import { checkPassword } from './api.js';
 
 function Login({ onOk }) {
@@ -27,7 +28,12 @@ function Login({ onOk }) {
   return (
     <div className="login-wrap">
       <form className="login-box" onSubmit={submit}>
-        <div className="login-logo">🍔 Elif Admin</div>
+        <div className="login-logo icon-txt" style={{ justifyContent: 'center' }}>
+          <span className="brand-mark">
+            <Icon name="burger" size={20} />
+          </span>
+          Elif Admin
+        </div>
         <div className="login-sub">Boshqaruv paneliga kirish</div>
         <input
           className="input"
@@ -62,33 +68,38 @@ export default function App() {
   return (
     <div className="layout">
       <aside className="sidebar">
-        <div className="logo">🍔 Elif Admin</div>
+        <div className="logo">
+          <span className="brand-mark">
+            <Icon name="burger" size={20} />
+          </span>
+          Elif Admin
+        </div>
         <button
           className={`nav-btn ${page === 'orders' ? 'active' : ''}`}
           onClick={() => setPage('orders')}
         >
-          📦 Buyurtmalar
+          <Icon name="box" size={19} /> Buyurtmalar
         </button>
         <button
           className={`nav-btn ${page === 'products' ? 'active' : ''}`}
           onClick={() => setPage('products')}
         >
-          🍔 Mahsulotlar
+          <Icon name="burger" size={19} /> Mahsulotlar
         </button>
         <button
           className={`nav-btn ${page === 'banners' ? 'active' : ''}`}
           onClick={() => setPage('banners')}
         >
-          🏷 Акции
+          <Icon name="tag" size={19} /> Акции
         </button>
         <button
           className={`nav-btn ${page === 'couriers' ? 'active' : ''}`}
           onClick={() => setPage('couriers')}
         >
-          🛵 Kuryerlar
+          <Icon name="bike" size={19} /> Kuryerlar
         </button>
         <button className="nav-btn logout-btn" onClick={logout}>
-          🚪 Chiqish
+          <Icon name="logout" size={19} /> Chiqish
         </button>
       </aside>
 

@@ -7,6 +7,7 @@ import {
   reseedMenu,
 } from '../api.js';
 import { formatPrice, fileToCompressedDataUrl } from '../utils.js';
+import Icon from '../components/Icon.jsx';
 
 const empty = {
   name: '',
@@ -129,7 +130,13 @@ export default function Products() {
             onClick={reseed}
             disabled={reseeding}
           >
-            {reseeding ? '⏳ Обновление...' : '🔄 Обновить меню из постеров'}
+            {reseeding ? (
+              'Обновление...'
+            ) : (
+              <>
+                <Icon name="refresh" size={16} /> Обновить меню из постеров
+              </>
+            )}
           </button>
           <button className="btn" onClick={openAdd}>
             + Yangi
@@ -141,7 +148,10 @@ export default function Products() {
         {loading ? (
           <div className="loader">Yuklanmoqda...</div>
         ) : products.length === 0 ? (
-          <div className="empty">🍕 Hozircha mahsulot yo'q</div>
+          <div className="empty">
+            <Icon name="inbox" size={44} strokeWidth={1.6} style={{ margin: '0 auto 10px' }} />
+            Hozircha mahsulot yo'q
+          </div>
         ) : (
           <table>
             <thead>
@@ -179,13 +189,13 @@ export default function Products() {
                         className="btn-sm btn-light"
                         onClick={() => openEdit(p)}
                       >
-                        ✏️ Tahrir
+                        <Icon name="pencil" size={15} /> Tahrir
                       </button>
                       <button
                         className="btn-sm btn-danger"
                         onClick={() => remove(p)}
                       >
-                        🗑 O'chirish
+                        <Icon name="trash" size={15} /> O'chirish
                       </button>
                     </div>
                   </td>
@@ -240,12 +250,18 @@ export default function Products() {
                       }}
                     />
                   ) : (
-                    '🍽'
+                    <Icon name="image" size={24} style={{ color: '#c4c4cc' }} />
                   )}
                 </div>
                 <div style={{ flex: 1 }}>
                   <label className="btn btn-light" style={{ cursor: 'pointer' }}>
-                    {uploading ? '⏳ Обработка...' : '📷 Загрузить фото'}
+                    {uploading ? (
+                      'Обработка...'
+                    ) : (
+                      <>
+                        <Icon name="camera" size={16} /> Загрузить фото
+                      </>
+                    )}
                     <input
                       type="file"
                       accept="image/*"

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getBanners, addBanner, updateBanner, deleteBanner } from '../api.js';
+import Icon from '../components/Icon.jsx';
 
 const empty = {
   title: '',
@@ -100,7 +101,10 @@ export default function Banners() {
         {loading ? (
           <div className="loader">Загрузка...</div>
         ) : banners.length === 0 ? (
-          <div className="empty">🏷 Пока нет акций</div>
+          <div className="empty">
+            <Icon name="tag" size={44} strokeWidth={1.6} style={{ margin: '0 auto 10px' }} />
+            Пока нет акций
+          </div>
         ) : (
           <table>
             <thead>
@@ -126,7 +130,11 @@ export default function Banners() {
                       {b.image ? (
                         <img className="thumb" src={b.image} alt="" />
                       ) : (
-                        <div style={{ fontSize: 26 }}>{b.emoji || '🏷'}</div>
+                        b.emoji ? (
+                        <div style={{ fontSize: 26 }}>{b.emoji}</div>
+                      ) : (
+                        <Icon name="tag" size={24} style={{ color: '#c4c4cc' }} />
+                      )
                       )}
                       <div>
                         <b>{b.title}</b>
@@ -148,7 +156,15 @@ export default function Banners() {
                       className={`btn-sm ${b.active ? 'btn-light' : 'btn-danger'}`}
                       onClick={() => toggleActive(b)}
                     >
-                      {b.active ? '✅ Активна' : '⛔ Выключена'}
+                      {b.active ? (
+                        <>
+                          <Icon name="check" size={14} /> Активна
+                        </>
+                      ) : (
+                        <>
+                          <Icon name="eyeOff" size={14} /> Выключена
+                        </>
+                      )}
                     </button>
                   </td>
                   <td>{b.sort}</td>
@@ -158,13 +174,13 @@ export default function Banners() {
                         className="btn-sm btn-light"
                         onClick={() => openEdit(b)}
                       >
-                        ✏️ Изменить
+                        <Icon name="pencil" size={15} /> Изменить
                       </button>
                       <button
                         className="btn-sm btn-danger"
                         onClick={() => remove(b)}
                       >
-                        🗑 Удалить
+                        <Icon name="trash" size={15} /> Удалить
                       </button>
                     </div>
                   </td>

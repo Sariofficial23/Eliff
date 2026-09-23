@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getOrders } from '../api.js';
 import { formatPrice } from '../utils.js';
+import Icon from '../components/Icon.jsx';
 
 const FILTERS = [
   { key: 'today', label: 'Bugun / Сегодня' },
@@ -94,7 +95,7 @@ export default function Couriers() {
           </div>
         </div>
         <button className="btn btn-light refresh" onClick={load}>
-          🔄 Yangilash
+          <Icon name="refresh" size={16} /> Yangilash
         </button>
       </div>
 
@@ -147,7 +148,10 @@ export default function Couriers() {
         {loading ? (
           <div className="loader">Yuklanmoqda...</div>
         ) : stats.length === 0 ? (
-          <div className="empty">📭 Bu davr uchun ma'lumot yo'q</div>
+          <div className="empty">
+            <Icon name="inbox" size={44} strokeWidth={1.6} style={{ margin: '0 auto 10px' }} />
+            Bu davr uchun ma'lumot yo'q
+          </div>
         ) : (
           <table>
             <thead>

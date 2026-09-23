@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getOrders, setOrderStatus } from '../api.js';
 import { formatPrice, formatDate } from '../utils.js';
+import Icon from '../components/Icon.jsx';
 
 const FILTERS = [
   { key: 'all', label: 'Hammasi / Все' },
@@ -82,12 +83,12 @@ export default function Orders() {
         {text && <div>{text}</div>}
         {urlMatch && (
           <a
-            className="map-link"
+            className="map-link icon-txt"
             href={urlMatch[0]}
             target="_blank"
             rel="noreferrer"
           >
-            📍 Xaritada ochish
+            <Icon name="pin" size={14} /> Xaritada ochish
           </a>
         )}
       </>
@@ -110,7 +111,7 @@ export default function Orders() {
           </div>
         </div>
         <button className="btn btn-light refresh" onClick={load}>
-          🔄 Yangilash
+          <Icon name="refresh" size={16} /> Yangilash
         </button>
       </div>
 
@@ -166,7 +167,10 @@ export default function Orders() {
         {loading ? (
           <div className="loader">Yuklanmoqda...</div>
         ) : filtered.length === 0 ? (
-          <div className="empty">📭 Bu davr uchun buyurtma yo'q</div>
+          <div className="empty">
+            <Icon name="inbox" size={44} strokeWidth={1.6} style={{ margin: '0 auto 10px' }} />
+            Bu davr uchun buyurtma yo'q
+          </div>
         ) : (
           <table>
             <thead>
@@ -216,9 +220,15 @@ export default function Orders() {
                         }`}
                         onClick={() => toggleStatus(o)}
                       >
-                        {o.status === 'yetkazildi'
-                          ? '↩ Qaytarish'
-                          : '✓ Yetkazildi'}
+                        {o.status === 'yetkazildi' ? (
+                          <>
+                            <Icon name="refresh" size={14} /> Qaytarish
+                          </>
+                        ) : (
+                          <>
+                            <Icon name="check" size={14} /> Yetkazildi
+                          </>
+                        )}
                       </button>
                     </td>
                   </tr>
