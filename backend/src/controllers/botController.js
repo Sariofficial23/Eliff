@@ -175,6 +175,13 @@ export const handleCallback = async (query) => {
           show_alert: true,
         });
       }
+      // Faqat buyurtmani olgan kuryer "Yetkazildi" deb belgilay oladi
+      if (order.courier && order.courier !== name) {
+        return bot.answerCallbackQuery(query.id, {
+          text: `Buni faqat ${order.courier} belgilay oladi`,
+          show_alert: true,
+        });
+      }
 
       await updateOrderStatus(orderId, 'yetkazildi');
 
