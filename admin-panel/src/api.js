@@ -68,6 +68,27 @@ export const saveSettings = (data) =>
     body: JSON.stringify(data),
   }).then(json);
 
+// Promokodlar (CRUD)
+export const getPromos = () =>
+  fetch(`${API}/api/admin/promos`, { headers: H() }).then(json);
+export const addPromo = (data) =>
+  fetch(`${API}/api/admin/promos`, {
+    method: 'POST',
+    headers: H(),
+    body: JSON.stringify(data),
+  }).then(json);
+export const updatePromo = (id, data) =>
+  fetch(`${API}/api/admin/promos/${id}`, {
+    method: 'PUT',
+    headers: H(),
+    body: JSON.stringify(data),
+  }).then(json);
+export const deletePromo = (id) =>
+  fetch(`${API}/api/admin/promos/${id}`, {
+    method: 'DELETE',
+    headers: H(),
+  }).then(json);
+
 // Aksiya bannerlari (CRUD)
 export const getBanners = () =>
   fetch(`${API}/api/admin/banners`, { headers: H() }).then(json);

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { formatPrice } from '../utils.js';
+import { checkPromo } from '../api.js';
 import Icon from './Icon.jsx';
 
 const COLA = { id: 'cola', name: 'Coca-Cola 0.5L', price: 5000 };
@@ -19,6 +20,10 @@ export default function Cart({
   const [geo, setGeo] = useState(null);
   const [geoStatus, setGeoStatus] = useState('idle');
   const [sending, setSending] = useState(false);
+  const [promoInput, setPromoInput] = useState('');
+  const [promo, setPromo] = useState(null); // { code, discount }
+  const [promoErr, setPromoErr] = useState('');
+  const [promoLoading, setPromoLoading] = useState(false);
 
   // Sozlamalardan (admin panelдан) — chegara va yetkazish narxi
   const FREE_FROM = Number(settings.freeFrom) > 0 ? Number(settings.freeFrom) : 100000;
@@ -32,7 +37,35 @@ export default function Cart({
   const goodsTotal = itemsTotal + (colaOn ? COLA.price : 0);
   const freeDelivery = goodsTotal >= FREE_FROM;
   const deliveryFee = freeDelivery ? 0 : DELIVERY_PRICE;
-  const total = goodsTotal + deliveryFee;
+  const discount = promo ? Math.min(promo.discount, goodsTotal) : 0;
+  const total = goodsTotal - discount + deliveryFee;
+
+  const applyPromo = async () => {
+    const code = promoInput.trim();
+    if (!code) return;
+    setPromoLoading(true);
+    setPromoErr('');
+    try {
+      const r = await checkPromo(code, goodsTotal);
+      if (r && r.ok) {
+        setPromo({ code: r.code, discount: r.discount });
+        setPromoErr('');
+      } else {
+        setPromo(null);
+        setPromoErr(r?.error || "Promokod noto'g'ri");
+      }
+    } catch (e) {
+      setPromoErr('Xatolik, qayta urining');
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const removePromo = () => {
+    setPromo(null);
+    setPromoInput('');
+    setPromoErr('');
+  };
 
   const sendLocation = () => {
     if (!navigator.geolocation) {
@@ -116,7 +149,13 @@ export default function Cart({
       .filter(Boolean)
       .join(' | ');
 
-    await onConfirm({ items, total, phone: fullPhone, location });
+    await onConfirm({
+      items,
+      total,
+      phone: fullPhone,
+      location,
+      promoCode: promo ? promo.code : null,
+    });
   };
 
   return (
@@ -228,6 +267,39 @@ export default function Cart({
           />
         </div>
 
+        {/* Promokod */}
+        <div className="promo-box">
+          {promo ? (
+            <div className="promo-applied">
+              <span>
+                <Icon name="tag" size={15} /> Promokod <b>{promo.code}</b> qo'llandi
+              </span>
+              <button className="promo-remove" onClick={removePromo}>
+                Bekor qilish
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="promo-input-row">
+                <input
+                  className="input promo-input"
+                  placeholder="Promokod"
+                  value={promoInput}
+                  onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                />
+                <button
+                  className="btn promo-apply"
+                  onClick={applyPromo}
+                  disabled={promoLoading || !promoInput.trim()}
+                >
+                  {promoLoading ? '...' : "Qo'llash"}
+                </button>
+              </div>
+              {promoErr && <div className="promo-err">{promoErr}</div>}
+            </>
+          )}
+        </div>
+
         {/* Yetkazib berish */}
         <div
           className="total-row"
@@ -246,6 +318,20 @@ export default function Cart({
           <div className="geo-hint" style={{ marginTop: 6 }}>
             Bepul yetkazish uchun yana{' '}
             <b>{formatPrice(FREE_FROM - goodsTotal)}</b>
+          </div>
+        )}
+
+        {discount > 0 && (
+          <div
+            className="total-row"
+            style={{ margin: '8px 0 0', fontSize: 14 }}
+          >
+            <span style={{ color: 'var(--text-2)' }}>
+              Chegirma ({promo.code}):
+            </span>
+            <span style={{ fontWeight: 700, color: 'var(--green)' }}>
+              −{formatPrice(discount)}
+            </span>
           </div>
         )}
 

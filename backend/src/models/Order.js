@@ -1,6 +1,14 @@
 import prisma from '../database/connection.js';
 
-export const createOrder = ({ userId, items, total, location, phone }) =>
+export const createOrder = ({
+  userId,
+  items,
+  total,
+  location,
+  phone,
+  promoCode,
+  discount,
+}) =>
   prisma.order.create({
     data: {
       userId,
@@ -8,6 +16,8 @@ export const createOrder = ({ userId, items, total, location, phone }) =>
       total: Number(total),
       location: location || null,
       phone: phone || null,
+      promoCode: promoCode || null,
+      discount: discount ? Number(discount) : 0,
     },
   });
 

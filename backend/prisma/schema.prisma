@@ -35,6 +35,17 @@ model Setting {
   value String
 }
 
+// Promokod
+model Promo {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  type      String   @default("percent") // percent | fixed
+  value     Int      @default(0)
+  active    Boolean  @default(true)
+  usedCount Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
 // Aksiya banneri (bosh sahifada karusel)
 model Banner {
   id        Int      @id @default(autoincrement())
@@ -60,6 +71,8 @@ model Order {
   total     Int
   location  String?
   phone     String?
+  promoCode String? // ishlatilgan promokod (bo'lsa)
+  discount  Int?     @default(0) // promokod chegirmasi
   status    String   @default("kutilmoqda") // kutilmoqda | yetkazildi
   courier   String? // buyurtmani olgan kuryer (ism/username)
   createdAt DateTime @default(now())

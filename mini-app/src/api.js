@@ -18,6 +18,13 @@ export const getBanners = () =>
 export const getSettings = () =>
   fetch(`${API}/api/settings`, { headers: headers() }).then((r) => r.json());
 
+export const checkPromo = (code, amount) =>
+  fetch(`${API}/api/promo/check`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ code, amount }),
+  }).then((r) => r.json());
+
 export const createOrder = (data) =>
   fetch(`${API}/api/orders`, {
     method: 'POST',

@@ -19,6 +19,12 @@ import {
   readSettings,
   saveSettings,
 } from '../controllers/settingsController.js';
+import {
+  listPromos,
+  addPromo,
+  editPromo,
+  removePromo,
+} from '../controllers/promoController.js';
 
 const router = Router();
 
@@ -43,6 +49,12 @@ router.delete('/banners/:id', removeBanner);
 // Sozlamalar (yetkazish)
 router.get('/settings', readSettings);
 router.put('/settings', saveSettings);
+
+// Promokodlar (CRUD)
+router.get('/promos', listPromos);
+router.post('/promos', addPromo);
+router.put('/promos/:id', editPromo);
+router.delete('/promos/:id', removePromo);
 
 // Buyurtmalar
 router.get('/orders', listOrders);

@@ -7,6 +7,7 @@ import {
 } from '../controllers/cartController.js';
 import { listActiveBanners } from '../controllers/bannerController.js';
 import { readSettings } from '../controllers/settingsController.js';
+import { checkPromo } from '../controllers/promoController.js';
 
 const router = Router();
 
@@ -14,6 +15,7 @@ const router = Router();
 router.get('/products', listProducts);
 router.get('/banners', listActiveBanners);
 router.get('/settings', readSettings);
+router.post('/promo/check', checkPromo);
 router.post('/orders', telegramAuth, placeOrder);
 router.get('/orders/my', telegramAuth, myOrders);
 

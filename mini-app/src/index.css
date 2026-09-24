@@ -868,6 +868,54 @@ a {
   outline: none;
   border-color: var(--brand);
 }
+/* ---------- Promokod ---------- */
+.promo-box {
+  margin-top: 16px;
+}
+.promo-input-row {
+  display: flex;
+  gap: 8px;
+}
+.promo-input {
+  flex: 1;
+  margin-bottom: 0;
+  text-transform: uppercase;
+}
+.promo-apply {
+  width: auto;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+.promo-err {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--brand);
+  font-weight: 600;
+}
+.promo-applied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--green-soft);
+  color: var(--green);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.promo-applied span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.promo-remove {
+  color: var(--brand);
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
 .total-row {
   display: flex;
   justify-content: space-between;
