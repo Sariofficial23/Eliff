@@ -1,6 +1,10 @@
 import bot from '../core/bot.js';
 import config from '../config/default.js';
-import { getOrderById, setOrderCourier } from '../models/Order.js';
+import {
+  getOrderById,
+  setOrderCourier,
+  updateOrderStatus,
+} from '../models/Order.js';
 
 // Manzil matni va GPS havolasini ajratib olish
 const parseLocation = (loc = '') => {
@@ -106,45 +110,92 @@ export const notifyCouriers = (order) => {
 export const handleCallback = async (query) => {
   try {
     const data = query.data || '';
-    if (!data.startsWith('take_')) return;
-
-    const orderId = Number(data.slice(5));
+    const chatId = query.message?.chat?.id;
+    const messageId = query.message?.message_id;
     const name = courierName(query.from);
-    const order = await getOrderById(orderId);
 
-    if (!order) {
+    // ---- 1) Kuryer buyurtmani oladi: "Men olaman" ----
+    if (data.startsWith('take_')) {
+      const orderId = Number(data.slice(5));
+      const order = await getOrderById(orderId);
+
+      if (!order) {
+        return bot.answerCallbackQuery(query.id, {
+          text: 'Buyurtma topilmadi',
+          show_alert: true,
+        });
+      }
+      if (order.courier) {
+        return bot.answerCallbackQuery(query.id, {
+          text: `Bu buyurtmani allaqachon ${order.courier} oldi`,
+          show_alert: true,
+        });
+      }
+
+      await setOrderCourier(orderId, name);
+
+      // Xabarni yangilaymiz: kim olganini yozamiz + "Yetkazildi" tugmasini qo'yamiz
+      const { mapUrl } = parseLocation(order.location || '');
+      const newText =
+        (query.message.text || `Buyurtma #${orderId}`) +
+        `\n\n✅ Qabul qildi: ${name}`;
+      const rows = [];
+      if (mapUrl) rows.push([{ text: '🗺 Xaritada ochish', url: mapUrl }]);
+      rows.push([
+        { text: '🏁 Yetkazildi', callback_data: `deliver_${orderId}` },
+      ]);
+
+      bot
+        .editMessageText(newText, {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: { inline_keyboard: rows },
+        })
+        .catch(() => {});
+
       return bot.answerCallbackQuery(query.id, {
-        text: 'Buyurtma topilmadi',
-        show_alert: true,
+        text: 'Siz bu buyurtmani oldingiz ✅',
       });
     }
-    if (order.courier) {
-      return bot.answerCallbackQuery(query.id, {
-        text: `Bu buyurtmani allaqachon ${order.courier} oldi`,
-        show_alert: true,
-      });
+
+    // ---- 2) Kuryer yetkazib berdi: "Yetkazildi" ----
+    if (data.startsWith('deliver_')) {
+      const orderId = Number(data.slice(8));
+      const order = await getOrderById(orderId);
+
+      if (!order) {
+        return bot.answerCallbackQuery(query.id, {
+          text: 'Buyurtma topilmadi',
+          show_alert: true,
+        });
+      }
+      if (order.status === 'yetkazildi') {
+        return bot.answerCallbackQuery(query.id, {
+          text: 'Bu buyurtma allaqachon yetkazilgan',
+          show_alert: true,
+        });
+      }
+
+      await updateOrderStatus(orderId, 'yetkazildi');
+
+      // Xabarni yakunlaymiz: "Yetkazildi", tugmani olib tashlaymiz (xarita qoladi)
+      const { mapUrl } = parseLocation(order.location || '');
+      const newText =
+        (query.message.text || `Buyurtma #${orderId}`) +
+        `\n\n🏁 Yetkazildi ✅ (${name})`;
+      const rows = [];
+      if (mapUrl) rows.push([{ text: '🗺 Xaritada ochish', url: mapUrl }]);
+
+      bot
+        .editMessageText(newText, {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: { inline_keyboard: rows },
+        })
+        .catch(() => {});
+
+      return bot.answerCallbackQuery(query.id, { text: 'Yetkazildi ✅' });
     }
-
-    await setOrderCourier(orderId, name);
-
-    // Guruhdagi xabarni yangilaymiz: kim olganini yozamiz, tugmani olib tashlaymiz
-    const { mapUrl } = parseLocation(order.location || '');
-    const newText =
-      (query.message.text || `Buyurtma #${orderId}`) +
-      `\n\n✅ Qabul qildi: ${name}`;
-    const kb = mapUrl
-      ? { inline_keyboard: [[{ text: '🗺 Xaritada ochish', url: mapUrl }]] }
-      : { inline_keyboard: [] };
-
-    bot
-      .editMessageText(newText, {
-        chat_id: query.message.chat.id,
-        message_id: query.message.message_id,
-        reply_markup: kb,
-      })
-      .catch(() => {});
-
-    bot.answerCallbackQuery(query.id, { text: 'Siz bu buyurtmani oldingiz ✅' });
   } catch (e) {
     console.log('Callback xato:', e.message);
   }
