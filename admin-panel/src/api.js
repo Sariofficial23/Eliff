@@ -68,6 +68,32 @@ export const saveSettings = (data) =>
     body: JSON.stringify(data),
   }).then(json);
 
+// Clopos (kassa)
+export const getCloposStatus = () =>
+  fetch(`${API}/api/admin/clopos/status`, { headers: H() }).then(json);
+export const getCloposProducts = () =>
+  fetch(`${API}/api/admin/clopos/products`, { headers: H() }).then(json);
+export const matchClopos = () =>
+  fetch(`${API}/api/admin/clopos/match`, { method: 'POST', headers: H() }).then(json);
+export const cloposTestOrder = (productId) =>
+  fetch(`${API}/api/admin/clopos/test-order`, {
+    method: 'POST',
+    headers: H(),
+    body: JSON.stringify({ productId }),
+  }).then(json);
+export const posRetry = (id, confirmed = false) =>
+  fetch(`${API}/api/admin/orders/${id}/pos-retry`, {
+    method: 'POST',
+    headers: H(),
+    body: JSON.stringify({ confirmed }),
+  }).then(json);
+export const posMarkSent = (id, posId) =>
+  fetch(`${API}/api/admin/orders/${id}/pos-mark-sent`, {
+    method: 'POST',
+    headers: H(),
+    body: JSON.stringify({ posId }),
+  }).then(json);
+
 // Aksiya bannerlari (CRUD)
 export const getBanners = () =>
   fetch(`${API}/api/admin/banners`, { headers: H() }).then(json);

@@ -26,6 +26,7 @@ model Product {
   oldPrice    Int?
   newPrice    Int
   category    String
+  cloposId    Int? // Clopos (kassa) dagi mahsulot ID'si
   createdAt   DateTime @default(now())
 }
 
@@ -63,4 +64,12 @@ model Order {
   status    String   @default("kutilmoqda") // kutilmoqda | yetkazildi
   courier   String? // buyurtmani olgan kuryer (ism/username)
   createdAt DateTime @default(now())
+
+  // Clopos (kassa) ga yuborish holati — core/posQueue.js
+  posStatus    String? // null | pending | preparing | sending | sent | error | unknown
+  posId        String? // Clopos buyurtma ID'si
+  posAttempts  Int       @default(0)
+  posError     String?
+  posNextAt    DateTime?
+  posUpdatedAt DateTime?
 }

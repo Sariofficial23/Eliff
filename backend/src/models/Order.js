@@ -1,6 +1,8 @@
 import prisma from '../database/connection.js';
 
-export const createOrder = ({ userId, items, total, location, phone }) =>
+// posStatus='pending' — Clopos navbati shu yozuvni oladi (buyurtma bilan bir
+// vaqtda saqlanadi, alohida "vazifa" yo'qolib qolmaydi)
+export const createOrder = ({ userId, items, total, location, phone, posStatus }) =>
   prisma.order.create({
     data: {
       userId,
@@ -8,6 +10,7 @@ export const createOrder = ({ userId, items, total, location, phone }) =>
       total: Number(total),
       location: location || null,
       phone: phone || null,
+      posStatus: posStatus || null,
     },
   });
 

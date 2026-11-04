@@ -11,6 +11,7 @@ import adminRoutes from './routes/admin.routes.js';
 import { registerBot } from './routes/bot.routes.js';
 import { ensureBannerTable } from './models/Banner.js';
 import { ensureSettingsTable } from './models/Setting.js';
+import { ensurePosColumns, startPosWorker } from './core/posQueue.js';
 
 // Xavfsizlik to'ri: kutilmagan xatolar jarayonni o'chirmasin (bot 24/7 ishlashi uchun)
 process.on('unhandledRejection', (e) =>
@@ -40,6 +41,9 @@ app.use('/api/admin', adminRoutes);
 // Aksiya bannerlari va sozlamalar jadvallarini tayyorlash (yo'q bo'lsa yaratadi)
 ensureBannerTable();
 ensureSettingsTable();
+// Clopos ustunlari (Product.cloposId, Order.pos*) — so'rovlardan oldin tayyor bo'lsin
+await ensurePosColumns();
+startPosWorker();
 
 // Botni ishga tushirish
 registerBot();

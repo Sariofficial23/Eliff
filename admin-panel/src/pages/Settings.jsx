@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getSettings, saveSettings } from '../api.js';
 import { formatPrice } from '../utils.js';
+import CloposPanel from '../components/CloposPanel.jsx';
 
 export default function Settings() {
   const [freeFrom, setFreeFrom] = useState('');
@@ -106,6 +107,8 @@ export default function Settings() {
           </>
         )}
       </div>
+
+      <CloposPanel />
     </div>
   );
 }

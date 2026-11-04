@@ -1,5 +1,11 @@
 import prisma from '../database/connection.js';
 
+// Clopos ID: musbat butun son yoki null (bo'sh maydon — bog'lanmagan)
+const cloposIdOf = (v) => {
+  const n = Number(v);
+  return Number.isSafeInteger(n) && n > 0 ? n : null;
+};
+
 export const getAllProducts = () =>
   prisma.product.findMany({ orderBy: { id: 'asc' } });
 
@@ -15,6 +21,7 @@ export const createProduct = (data) =>
       oldPrice: data.oldPrice ? Number(data.oldPrice) : null,
       newPrice: Number(data.newPrice),
       category: data.category,
+      cloposId: cloposIdOf(data.cloposId),
     },
   });
 
@@ -28,6 +35,8 @@ export const updateProduct = (id, data) =>
       oldPrice: data.oldPrice ? Number(data.oldPrice) : null,
       newPrice: Number(data.newPrice),
       category: data.category,
+      // Forma cloposId yubormasa — mavjud bog'lanish saqlanadi
+      ...(data.cloposId !== undefined ? { cloposId: cloposIdOf(data.cloposId) } : {}),
     },
   });
 

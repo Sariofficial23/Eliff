@@ -252,6 +252,10 @@ tr:hover td {
   background: #e7f9ed;
   color: var(--green);
 }
+.badge.pos-bad {
+  background: #fdecee;
+  color: #c00;
+}
 
 /* Yangi (hali topshirilmagan) buyurtma — yengil sariq belgi */
 .row-new td {
