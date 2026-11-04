@@ -32,6 +32,9 @@ const clopos = {
   // Yetkazish ID'si berilmasa — narx delivery_fee maydonida yuboriladi.
   colaProductId: Number(process.env.CLOPOS_COLA_PRODUCT_ID) || null,
   deliveryProductId: Number(process.env.CLOPOS_DELIVERY_PRODUCT_ID) || null,
+  // true — buyurtma kassada darhol qabul qilingan bo'ladi (kassir tasdig'isiz).
+  // Standart: false — kassir Clopos'da qo'lda qabul qiladi.
+  autoAccept: /^(1|true|yes)$/i.test(String(process.env.CLOPOS_AUTO_ACCEPT || '').trim()),
 };
 clopos.enabled = Boolean(
   clopos.clientId &&

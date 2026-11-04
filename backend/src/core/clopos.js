@@ -306,7 +306,7 @@ export function buildOrderPayload(order, user, products, settings) {
     customer,
     serverTotal,
     payload: {
-      auto_order_accept: false, // kassir Clopos'da o'zi qabul qiladi
+      auto_order_accept: C.autoAccept, // false — kassir Clopos'da o'zi qabul qiladi
       order_number: `ELIF-${order.id}`.slice(0, 20),
       sale_type_id: null, // sendOrder ichida to'ldiriladi
       // order_number — dublikatni tekshirish uchun bizning raqam
@@ -386,6 +386,24 @@ export async function findPosOrder(orderNumber) {
   return hit || null;
 }
 
+// Admin: kassadagi buyurtmani tekshirish — Clopos'ning xom javobi
+// (holati, filial, savdo turi) — buyurtma qayerda turganini ko'rish uchun.
+export async function inspectPosOrder(posId, orderNumber) {
+  const out = {};
+  if (posId) {
+    const r = await apiCall(`/orders/${encodeURIComponent(posId)}`);
+    out.byId = { status: r.status, data: r.data?.data ?? r.data };
+  }
+  if (orderNumber) {
+    try {
+      out.byNumber = await findPosOrder(orderNumber);
+    } catch (e) {
+      out.byNumberError = e.message;
+    }
+  }
+  return out;
+}
+
 export const cloposEnabled = () => C.enabled;
 
 // ---- Admin: sinov buyurtmasi ----
@@ -401,7 +419,7 @@ export async function sendTestOrder(product, phone) {
   const customer = { name: 'TEST Elif bot', phone: testPhone };
   const customerId = await resolveCustomerId(customer);
   const payload = {
-    auto_order_accept: false,
+    auto_order_accept: C.autoAccept,
     order_number: `TEST-${Date.now() % 100000}`,
     sale_type_id: saleTypeId,
     venue_id: C.venueId,
@@ -514,6 +532,7 @@ export async function checkCloposStatus() {
     saleTypeDelivery: C.saleTypeDelivery,
     colaProductId: C.colaProductId,
     deliveryProductId: C.deliveryProductId,
+    autoAccept: C.autoAccept,
     missing,
   };
   if (missing.length) {

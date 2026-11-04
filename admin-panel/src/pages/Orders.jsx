@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getOrders, setOrderStatus, posRetry, posMarkSent } from '../api.js';
+import { getOrders, setOrderStatus, posRetry, posMarkSent, posCheck } from '../api.js';
 import { formatPrice, formatDate } from '../utils.js';
 import Icon from '../components/Icon.jsx';
 
@@ -111,6 +111,11 @@ export default function Orders() {
     load();
   };
 
+  const checkPos = async (o) => {
+    const r = await posCheck(o.id);
+    alert(`Clopos javobi (ELIF-${o.id}):\n\n` + JSON.stringify(r, null, 2).slice(0, 1800));
+  };
+
   const renderPos = (o) => {
     if (!o.posStatus) return <span style={{ color: '#999' }}>—</span>;
     const l = POS_LABEL[o.posStatus] || { text: o.posStatus, cls: 'pending' };
@@ -123,6 +128,11 @@ export default function Orders() {
           <div style={{ fontSize: 12, color: bad ? '#c00' : '#a60', maxWidth: 220 }}>
             {o.posError}
           </div>
+        )}
+        {o.posStatus === 'sent' && (
+          <button className="btn-sm btn-light" onClick={() => checkPos(o)}>
+            <Icon name="refresh" size={14} /> Kassada tekshirish
+          </button>
         )}
         {bad && (
           <>

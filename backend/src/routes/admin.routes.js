@@ -14,6 +14,7 @@ import {
   cloposTestOrder,
   cloposRetryOrder,
   cloposMarkSent,
+  cloposInspectOrder,
 } from '../controllers/adminController.js';
 import {
   listBanners,
@@ -61,5 +62,6 @@ router.post('/clopos/match', cloposMatch);
 router.post('/clopos/test-order', cloposTestOrder);
 router.post('/orders/:id/pos-retry', cloposRetryOrder);
 router.post('/orders/:id/pos-mark-sent', cloposMarkSent);
+router.get('/orders/:id/pos-check', cloposInspectOrder);
 
 export default router;

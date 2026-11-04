@@ -114,6 +114,10 @@ export default function CloposPanel() {
               <div>
                 Филиал (venue_id): <b>{st.venueId}</b> · бренд: <b>{st.brand}</b>
               </div>
+              <div>
+                Принятие заказа:{' '}
+                <b>{st.autoAccept ? 'автоматически (CLOPOS_AUTO_ACCEPT=true)' : 'вручную кассиром'}</b>
+              </div>
               {st.saleTypes && (
                 <div>
                   Типы продаж:{' '}
