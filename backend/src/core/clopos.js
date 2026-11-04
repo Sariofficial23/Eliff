@@ -12,6 +12,7 @@
 
 import { randomUUID } from 'crypto';
 import config from '../config/default.js';
+import { CLOPOS_MAP } from '../data/cloposMap.js';
 
 const C = config.clopos;
 const TIMEOUT_MS = 15000;
@@ -445,8 +446,9 @@ const norm = (s) =>
 
 // Nomi aniq mos kelgan mahsulotlarga cloposId qo'yish (bo'sh bo'lsa).
 // Qo'lda qo'yilgan ID'lar o'zgartirilmaydi. Narx farqi hisobotda ko'rsatiladi.
-export async function matchCloposIds(prisma) {
+export async function matchCloposIds(prisma, aliases = CLOPOS_MAP) {
   const cloposItems = await fetchCloposProducts();
+  const byId = new Map(cloposItems.map((c) => [Number(c.cloposId), c]));
   const byName = new Map();
   const dup = new Set();
   for (const c of cloposItems) {
@@ -460,18 +462,20 @@ export async function matchCloposIds(prisma) {
   const priceDiff = [];
   const notFound = [];
   for (const p of products) {
-    const k = norm(p.name);
-    const c = dup.has(k) ? null : byName.get(k);
-    if (!c) {
-      if (!p.cloposId) notFound.push(p.name);
-      continue;
-    }
+    let c = p.cloposId ? byId.get(Number(p.cloposId)) : null;
     if (!p.cloposId) {
+      // 1) kassada nomi aniq bir xil (va yagona) bo'lsa; 2) bog'lanish jadvali
+      const k = norm(p.name);
+      c = (!dup.has(k) && byName.get(k)) || byId.get(Number(aliases[p.name])) || null;
+      if (!c) {
+        notFound.push(p.name);
+        continue;
+      }
       await prisma.product.update({ where: { id: p.id }, data: { cloposId: c.cloposId } });
       matched++;
     }
-    if ((p.cloposId || c.cloposId) === c.cloposId && c.price && c.price !== p.newPrice) {
-      priceDiff.push(`${p.name}: bot ${p.newPrice}, Clopos ${c.price}`);
+    if (c && c.price && c.price !== p.newPrice) {
+      priceDiff.push(`${p.name}: bot ${p.newPrice}, Clopos ${c.price} (${c.name})`);
     }
   }
   return {

@@ -265,3 +265,36 @@ test('sinov buyurtmasi alohida TEST mijoz bilan, haqiqiy telefonsiz', async () =
   assert.equal(orders[0].customer.id, 51);
   assert.equal(orders[0].customer.phone, '');
 });
+
+test('tovarlarni bog\'lash: aniq nom, dublikat nomda jadval, qo\'lda ID o\'zgarmaydi', async () => {
+  handler = async ({ path }) => {
+    assert.equal(path, '/products');
+    return Response.json({
+      data: [
+        { id: 1, name: 'Лаваш', type: 'DISH', price: 38000 },
+        { id: 31, name: 'Трайфл сникерс', type: 'DISH', price: 50000 },
+        { id: 231, name: 'Трайфл сникерс', type: 'DISH', price: 50000 },
+        { id: 24, name: 'Чиз бургер', type: 'DISH', price: 36000 },
+      ],
+      total: 4,
+    });
+  };
+  const rows = [
+    { id: 1, name: 'Лаваш', newPrice: 38000, cloposId: null },
+    { id: 2, name: 'Трайфл сникерс', newPrice: 50000, cloposId: null },
+    { id: 3, name: 'Чизбургер', newPrice: 35000, cloposId: null },
+    { id: 4, name: 'Yangi', newPrice: 1, cloposId: null },
+    { id: 5, name: 'Qo\'lda', newPrice: 1, cloposId: 999 },
+  ];
+  const fakePrisma = {
+    product: {
+      findMany: async () => rows,
+      update: async ({ where, data }) => Object.assign(rows.find((r) => r.id === where.id), data),
+    },
+  };
+  const r = await api.matchCloposIds(fakePrisma, { 'Трайфл сникерс': 31, 'Чизбургер': 24, Yangi: 12345 });
+  assert.deepEqual(rows.map((x) => x.cloposId), [1, 31, 24, null, 999]);
+  assert.equal(r.matched, 3);
+  assert.deepEqual(r.notFound, ['Yangi']);
+  assert.ok(r.priceDiff.some((d) => d.startsWith('Чизбургер: bot 35000, Clopos 36000')));
+});
