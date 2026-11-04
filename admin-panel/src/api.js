@@ -75,11 +75,11 @@ export const getCloposProducts = () =>
   fetch(`${API}/api/admin/clopos/products`, { headers: H() }).then(json);
 export const matchClopos = () =>
   fetch(`${API}/api/admin/clopos/match`, { method: 'POST', headers: H() }).then(json);
-export const cloposTestOrder = (productId) =>
+export const cloposTestOrder = (productId, phone) =>
   fetch(`${API}/api/admin/clopos/test-order`, {
     method: 'POST',
     headers: H(),
-    body: JSON.stringify({ productId }),
+    body: JSON.stringify({ productId, phone }),
   }).then(json);
 export const posRetry = (id, confirmed = false) =>
   fetch(`${API}/api/admin/orders/${id}/pos-retry`, {

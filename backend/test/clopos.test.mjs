@@ -251,19 +251,21 @@ test('kassada buyurtmani order_number bo\'yicha topish — faqat aniq mos', asyn
   assert.equal(await api.findPosOrder('ELIF-123'), null);
 });
 
-test('sinov buyurtmasi alohida TEST mijoz bilan, haqiqiy telefonsiz', async () => {
+test('sinov buyurtmasi: telefon majburiy, shu telefonli mijoz yaratiladi', async () => {
+  await assert.rejects(api.sendTestOrder(products[0], ''), (e) => e.kind === 'error');
   handler = async ({ url, method, body }) => {
     if (method === 'GET') {
-      assert.equal(url.searchParams.get('filters[0][0]'), 'name');
-      return Response.json({ data: [{ id: 99, name: 'TEST Elif bot', code: 'BOSHQA' }], total: 1 });
+      assert.equal(url.searchParams.get('filters[0][0]'), 'phones');
+      return Response.json({ data: [], total: 0 });
     }
-    assert.deepEqual(body, { name: 'TEST Elif bot', code: 'ELIF-BOT-TEST' });
+    assert.deepEqual(body, { name: 'TEST Elif bot', phone: '+998905556677' });
     return Response.json({ data: { id: 51 } });
   };
-  const r = await api.sendTestOrder(products[0]);
+  const r = await api.sendTestOrder(products[0], '90 555 66 77');
   assert.equal(r.ok, true);
   assert.equal(orders[0].customer.id, 51);
-  assert.equal(orders[0].customer.phone, '');
+  assert.equal(orders[0].customer.phone, '+998905556677');
+  assert.ok(orders[0].comment.startsWith('Telefon: +998905556677 | Manzil:'));
 });
 
 test('tovarlarni bog\'lash: aniq nom, dublikat nomda jadval, qo\'lda ID o\'zgarmaydi', async () => {

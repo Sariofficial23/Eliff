@@ -28,6 +28,7 @@ export default function CloposPanel() {
   const [testRes, setTestRes] = useState(null);
   const [mapped, setMapped] = useState([]);
   const [testId, setTestId] = useState('');
+  const [testPhone, setTestPhone] = useState('');
 
   const check = () => {
     setBusy('check');
@@ -66,10 +67,14 @@ export default function CloposPanel() {
 
   const sendTest = async () => {
     if (!testId) return;
+    if (testPhone.replace(/\D/g, '').length < 9) {
+      alert('Введите свой номер телефона: Clopos создаёт клиента только с телефоном');
+      return;
+    }
     if (!window.confirm('В кассу Clopos уйдёт ТЕСТОВЫЙ заказ (клиент «TEST Elif bot»). Его можно отклонить. Отправить?')) return;
     setBusy('test');
     try {
-      setTestRes({ open: true, result: await cloposTestOrder(Number(testId)) });
+      setTestRes({ open: true, result: await cloposTestOrder(Number(testId), testPhone) });
     } finally {
       setBusy('');
     }
@@ -199,12 +204,19 @@ export default function CloposPanel() {
               </option>
             ))}
           </select>
+          <input
+            className="input"
+            style={{ width: 190 }}
+            placeholder="Ваш телефон +998..."
+            value={testPhone}
+            onChange={(e) => setTestPhone(e.target.value)}
+          />
           <button className="btn" onClick={sendTest} disabled={!testId || !!busy}>
             {busy === 'test' ? 'Отправка...' : 'Отправить тест'}
           </button>
           {testRes.result && (
             <pre style={{ width: '100%', fontSize: 12, whiteSpace: 'pre-wrap', margin: 0 }}>
-              {testRes.result.ok ? '✅ ' : '❌ '}
+              {testRes.result.ok ? '✅ Заказ создан в Clopos. ' : '❌ '}
               {JSON.stringify(testRes.result.response ?? testRes.result, null, 2).slice(0, 800)}
             </pre>
           )}
