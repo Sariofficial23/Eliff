@@ -5,6 +5,8 @@ import {
 } from '../models/Order.js';
 import { findOrCreateUser, getUserByTelegramId } from '../models/User.js';
 import { sendOrderConfirmation, notifyCouriers } from './botController.js';
+import { cloposEnabled } from '../core/clopos.js';
+import { kickPosQueue } from '../core/posQueue.js';
 
 // GET /api/products
 export const listProducts = async (req, res) => {
@@ -42,6 +44,7 @@ export const placeOrder = async (req, res) => {
       total,
       location,
       phone,
+      posStatus: cloposEnabled() ? 'pending' : null,
     });
 
     // Botga xabar (mijozga)
@@ -49,6 +52,9 @@ export const placeOrder = async (req, res) => {
 
     // Kuryerlar guruhiga yuborish
     notifyCouriers(order);
+
+    // Clopos (kassa) — navbat orqali; xato bo'lsa ham buyurtma va xabarlar saqlanadi
+    kickPosQueue();
 
     res.json({ ok: true, orderId: order.id });
   } catch (e) {

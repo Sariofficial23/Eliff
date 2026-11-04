@@ -8,6 +8,12 @@ import {
   listOrders,
   changeOrderStatus,
   reseedMenu,
+  cloposStatus,
+  cloposProducts,
+  cloposMatch,
+  cloposTestOrder,
+  cloposRetryOrder,
+  cloposMarkSent,
 } from '../controllers/adminController.js';
 import {
   listBanners,
@@ -47,5 +53,13 @@ router.put('/settings', saveSettings);
 // Buyurtmalar
 router.get('/orders', listOrders);
 router.patch('/orders/:id', changeOrderStatus);
+
+// Clopos (kassa)
+router.get('/clopos/status', cloposStatus);
+router.get('/clopos/products', cloposProducts);
+router.post('/clopos/match', cloposMatch);
+router.post('/clopos/test-order', cloposTestOrder);
+router.post('/orders/:id/pos-retry', cloposRetryOrder);
+router.post('/orders/:id/pos-mark-sent', cloposMarkSent);
 
 export default router;

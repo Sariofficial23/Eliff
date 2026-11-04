@@ -16,6 +16,7 @@ const empty = {
   newPrice: '',
   oldPrice: '',
   category: '',
+  cloposId: '',
 };
 
 export default function Products() {
@@ -52,6 +53,7 @@ export default function Products() {
       newPrice: p.newPrice,
       oldPrice: p.oldPrice || '',
       category: p.category || '',
+      cloposId: p.cloposId || '',
     });
     setEditId(p.id);
     setModal(true);
@@ -201,6 +203,7 @@ export default function Products() {
                 <th>Tarkibi</th>
                 <th>Kategoriya</th>
                 <th>Narxi</th>
+                <th>Clopos ID</th>
                 <th></th>
               </tr>
             </thead>
@@ -222,6 +225,9 @@ export default function Products() {
                     {p.oldPrice ? (
                       <span className="price-old">{formatPrice(p.oldPrice)}</span>
                     ) : null}
+                  </td>
+                  <td style={{ color: p.cloposId ? undefined : 'var(--muted)' }}>
+                    {p.cloposId || '—'}
                   </td>
                   <td>
                     <div className="actions">
@@ -365,6 +371,16 @@ export default function Products() {
                 value={form.category}
                 onChange={set('category')}
                 placeholder="Klassik, Achchiq, Milliy..."
+              />
+            </div>
+            <div className="field">
+              <label>Clopos ID (kassadagi mahsulot raqami)</label>
+              <input
+                className="input"
+                type="number"
+                value={form.cloposId}
+                onChange={set('cloposId')}
+                placeholder="Sozlamalar → Clopos ro'yxatidan"
               />
             </div>
 

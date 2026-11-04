@@ -9,7 +9,8 @@
     "start": "node src/index.js",
     "seed": "node prisma/seed.js",
     "db:push": "prisma db push",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "test": "node --test test/*.test.mjs"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getOrders, setOrderStatus } from '../api.js';
+import { getOrders, setOrderStatus, posRetry, posMarkSent } from '../api.js';
 import { formatPrice, formatDate } from '../utils.js';
 import Icon from '../components/Icon.jsx';
 
@@ -9,6 +9,16 @@ const FILTERS = [
   { key: 'yesterday', label: 'Kecha / Вчера' },
   { key: 'week', label: '7 kun / Неделя' },
 ];
+
+// Clopos (kassa) holati
+const POS_LABEL = {
+  pending: { text: 'Navbatda', cls: 'pending' },
+  preparing: { text: 'Yuborilmoqda', cls: 'pending' },
+  sending: { text: 'Yuborilmoqda', cls: 'pending' },
+  sent: { text: 'Kassada', cls: 'done' },
+  error: { text: 'Xato', cls: 'pos-bad' },
+  unknown: { text: "Noma'lum", cls: 'pos-bad' },
+};
 
 const sameDay = (d, ref) => {
   const x = new Date(d);
@@ -71,6 +81,62 @@ export default function Orders() {
   }, [orders, filter, dateStr]);
 
   const total = filtered.reduce((s, o) => s + (o.total || 0), 0);
+
+  // Clopos ustuni faqat integratsiya ishlatilgan bo'lsa ko'rinadi
+  const showPos = orders.some((o) => o.posStatus);
+
+  const retryPos = async (o) => {
+    let r = await posRetry(o.id);
+    if (r?.needConfirm) {
+      const yes = window.confirm(
+        `${r.error}\n\nClopos kassasida ELIF-${o.id} buyurtmasi YO'QLIGINI tekshirdingizmi? ` +
+          'OK — qayta yuborish (kassada bo\'lsa — dublikat bo\'ladi).',
+      );
+      if (!yes) return;
+      r = await posRetry(o.id, true);
+    }
+    if (r && !r.ok) alert(r.error || 'Xato');
+    else if (r?.found) alert('Buyurtma kassada topildi ✅');
+    load();
+  };
+
+  const markSent = async (o) => {
+    const posId = window.prompt(
+      `ELIF-${o.id} kassada bor bo'lsa — Clopos buyurtma raqamini kiriting (ixtiyoriy):`,
+      '',
+    );
+    if (posId === null) return;
+    const r = await posMarkSent(o.id, posId.trim());
+    if (r && !r.ok) alert(r.error || 'Xato');
+    load();
+  };
+
+  const renderPos = (o) => {
+    if (!o.posStatus) return <span style={{ color: '#999' }}>—</span>;
+    const l = POS_LABEL[o.posStatus] || { text: o.posStatus, cls: 'pending' };
+    const bad = o.posStatus === 'error' || o.posStatus === 'unknown';
+    return (
+      <div className="status-cell">
+        <span className={`badge ${l.cls}`}>{l.text}</span>
+        {o.posId && <div style={{ fontSize: 12, color: '#666' }}>ID {o.posId}</div>}
+        {o.posError && (
+          <div style={{ fontSize: 12, color: bad ? '#c00' : '#a60', maxWidth: 220 }}>
+            {o.posError}
+          </div>
+        )}
+        {bad && (
+          <>
+            <button className="btn-sm btn-light" onClick={() => retryPos(o)}>
+              <Icon name="refresh" size={14} /> Qayta yuborish
+            </button>
+            <button className="btn-sm btn-light" onClick={() => markSent(o)}>
+              <Icon name="check" size={14} /> Kassada bor
+            </button>
+          </>
+        )}
+      </div>
+    );
+  };
 
   const toggleStatus = async (o) => {
     const next = o.status === 'yetkazildi' ? 'kutilmoqda' : 'yetkazildi';
@@ -192,6 +258,7 @@ export default function Orders() {
                 <th>Kuryer</th>
                 <th>Sana</th>
                 <th>Holati</th>
+                {showPos && <th>Kassa</th>}
               </tr>
             </thead>
             <tbody>
@@ -252,6 +319,7 @@ export default function Orders() {
                         </button>
                       </div>
                     </td>
+                    {showPos && <td>{renderPos(o)}</td>}
                   </tr>
                 );
               })}
