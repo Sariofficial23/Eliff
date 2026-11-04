@@ -11,6 +11,7 @@ import {
   checkCloposStatus,
   cloposEnabled,
   fetchCloposProducts,
+  inspectPosOrder,
   matchCloposIds,
   sendTestOrder,
 } from '../core/clopos.js';
@@ -184,5 +185,17 @@ export const cloposMarkSent = async (req, res) => {
     res.status(r.ok ? 200 : 400).json(r);
   } catch (e) {
     res.status(500).json({ error: e.message });
+  }
+};
+
+// Kassadagi buyurtmani tekshirish (Clopos xom javobi)
+export const cloposInspectOrder = async (req, res) => {
+  if (!cloposEnabled()) return res.status(400).json({ error: 'Clopos sozlanmagan' });
+  try {
+    const order = await prisma.order.findUnique({ where: { id: Number(req.params.id) } });
+    if (!order) return res.status(404).json({ error: 'Buyurtma topilmadi' });
+    res.json(await inspectPosOrder(order.posId, `ELIF-${order.id}`));
+  } catch (e) {
+    res.status(502).json({ error: e.message });
   }
 };

@@ -87,6 +87,8 @@ export const posRetry = (id, confirmed = false) =>
     headers: H(),
     body: JSON.stringify({ confirmed }),
   }).then(json);
+export const posCheck = (id) =>
+  fetch(`${API}/api/admin/orders/${id}/pos-check`, { headers: H() }).then(json);
 export const posMarkSent = (id, posId) =>
   fetch(`${API}/api/admin/orders/${id}/pos-mark-sent`, {
     method: 'POST',
