@@ -388,10 +388,17 @@ export async function findPosOrder(orderNumber) {
 
 export const cloposEnabled = () => C.enabled;
 
-// ---- Admin: sinov buyurtmasi (alohida TEST mijoz, haqiqiy telefonsiz) ----
-export async function sendTestOrder(product) {
+// ---- Admin: sinov buyurtmasi ----
+// Clopos mijoz yaratishda telefonni majburiy so'raydi, shuning uchun admin
+// o'z raqamini kiritadi: shu telefonli mijoz topiladi yoki yaratiladi.
+export async function sendTestOrder(product, phone) {
+  const digits = phoneDigits(phone);
+  if (digits.length < 9) {
+    throw new PosError('error', 'Sinov uchun telefon raqamini kiriting (+998XXXXXXXXX)');
+  }
+  const testPhone = digits.length === 9 ? `+998${digits}` : `+${digits}`;
   const saleTypeId = await resolveSaleTypeId();
-  const customer = { name: 'TEST Elif bot', code: 'ELIF-BOT-TEST' };
+  const customer = { name: 'TEST Elif bot', phone: testPhone };
   const customerId = await resolveCustomerId(customer);
   const payload = {
     auto_order_accept: false,
@@ -399,8 +406,8 @@ export async function sendTestOrder(product) {
     sale_type_id: saleTypeId,
     venue_id: C.venueId,
     delivery_fee: 0,
-    comment: 'TEST — Elif bot (rad etish mumkin)',
-    customer: { id: customerId, customer_discount_type: 0, name: customer.name, phone: '', address: 'Test manzil' },
+    comment: `Telefon: ${testPhone} | Manzil: Test manzil | TEST — Elif bot (rad etish mumkin)`,
+    customer: { id: customerId, customer_discount_type: 0, name: customer.name, phone: testPhone, address: 'Test manzil' },
     products: [
       {
         product_id: product.cloposId,

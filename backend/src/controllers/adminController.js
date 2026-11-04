@@ -158,7 +158,10 @@ export const cloposTestOrder = async (req, res) => {
     if (!product?.cloposId) {
       return res.status(400).json({ error: "Clopos ID'si bor mahsulotni tanlang" });
     }
-    res.json(await sendTestOrder(product));
+    if (String(req.body?.phone || '').replace(/\D/g, '').length < 9) {
+      return res.status(400).json({ error: 'Telefon raqamini kiriting' });
+    }
+    res.json(await sendTestOrder(product, req.body?.phone));
   } catch (e) {
     res.status(502).json({ error: e.message });
   }
