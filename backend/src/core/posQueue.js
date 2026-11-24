@@ -19,8 +19,6 @@ import { cloposEnabled, findPosOrder, sendOrder } from './clopos.js';
 
 const MAX_ATTEMPTS = 6;
 const BACKOFF_MIN = [1, 2, 5, 10, 30]; // urinishlar orasidagi kutish (daqiqa)
-const TICK_MS = 20000;
-
 let running = false;
 let timer = null;
 
@@ -150,40 +148,71 @@ async function processOrder(order) {
   }
 }
 
+// Navbat bazani doimiy so'ramaydi: faqat yangi buyurtma kelganda, startда va
+// rejalashtirilgan qayta urinish vaqtida ishlaydi. Shunda bepul Neon bazasi
+// bo'sh paytda uxlaydi va oylik limit tugab qolmaydi.
+let rerun = false;
+
+function scheduleAt(when) {
+  if (timer) clearTimeout(timer);
+  const ms = Math.max(5000, when.getTime() - Date.now());
+  timer = setTimeout(() => {
+    timer = null;
+    tickPosQueue();
+  }, ms);
+}
+
 export async function tickPosQueue() {
-  if (running || !cloposEnabled()) return;
+  if (!cloposEnabled()) return;
+  if (running) {
+    rerun = true;
+    return;
+  }
   running = true;
   try {
-    const due = await prisma.order.findMany({
-      where: {
-        posStatus: 'pending',
-        OR: [{ posNextAt: null }, { posNextAt: { lte: new Date() } }],
-      },
-      orderBy: { id: 'asc' },
-      take: 10,
-      include: { user: true },
+    do {
+      rerun = false;
+      const due = await prisma.order.findMany({
+        where: {
+          posStatus: 'pending',
+          OR: [{ posNextAt: null }, { posNextAt: { lte: new Date() } }],
+        },
+        orderBy: { id: 'asc' },
+        take: 10,
+        include: { user: true },
+      });
+      for (const o of due) await processOrder(o);
+      if (due.length === 10) rerun = true;
+    } while (rerun);
+    // Keyingi qayta urinish bo'lsa — aynan o'sha vaqtga taymer qo'yamiz
+    const next = await prisma.order.findFirst({
+      where: { posStatus: 'pending', posNextAt: { not: null } },
+      orderBy: { posNextAt: 'asc' },
+      select: { posNextAt: true },
     });
-    for (const o of due) await processOrder(o);
+    if (next?.posNextAt) scheduleAt(next.posNextAt);
   } catch (e) {
     console.error('POS navbati xatosi:', e.message);
+    scheduleAt(new Date(Date.now() + 60000));
   } finally {
     running = false;
   }
 }
 
-// Yangi buyurtmadan keyin darhol (navbatni kutmasdan) yuborish
+// Yangi buyurtmadan keyin darhol yuborish
 export const kickPosQueue = () => {
   if (cloposEnabled()) setImmediate(() => tickPosQueue());
 };
 
+let started = false;
 export async function startPosWorker() {
-  if (!cloposEnabled() || timer) return;
+  if (!cloposEnabled() || started) return;
+  started = true;
   try {
     await recover();
   } catch (e) {
     console.error('POS navbatini tiklashda xato:', e.message);
   }
-  timer = setInterval(tickPosQueue, TICK_MS);
   tickPosQueue();
   console.log('🧾 Clopos navbati ishga tushdi');
 }
